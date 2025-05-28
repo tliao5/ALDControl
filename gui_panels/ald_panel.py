@@ -41,13 +41,15 @@ class ALDPanel:
     def start_run(self):
         try:
             print("Prepping New Run")
+            loops = int(self.loops.get())
             # Check if a file is loaded
             if not self.app.ald_controller.file:
-                self.recipe_label.config(text="Status: Invalid Input - No File Selected")
+                self.recipe_label.config(text="Status: Invalid Input")
                 return
-
+            if loops == 0:
+                self.recipe_label.config(text="Status: Invalid Input")
+                return
             # Dynamically update loops variable from the entry field
-            loops = int(self.loops.get())
             self.recipe_label.config(text=f"Status: Run for {loops} loops")
 
             print(loops)
@@ -68,16 +70,16 @@ class ALDPanel:
             if not self.confirm_button:
                 self.confirm_button = tk.Button(
                     self.recipe_label.master, text="Confirm", font=FONT, bg=ON_COLOR, relief=BUTTON_STYLE,
-                    command=lambda: self.confirm_run(loops)
+                    command=lambda loops = self.loops : self.confirm_run(loops)
                 )
-                self.confirm_button.pack(side=tk.LEFT, padx=5)
-        except ValueError:
+            self.confirm_button.pack(side=tk.LEFT, padx=5)
+        except:
             self.recipe_label.config(text="Status: Invalid Input")
 
     def confirm_run(self, loops):
         # Check if a file is selected
         if not self.app.ald_controller.file:
-            self.recipe_label.config(text="Status: Invalid Input - No File Selected")
+            self.recipe_label.config(text="Status: Invalid Input")
             return
 
         # Disable the entry and Run Recipe button in the recipe frame
@@ -85,15 +87,16 @@ class ALDPanel:
         for widget in recipe_frame.winfo_children():
             if isinstance(widget, tk.Entry) or (isinstance(widget, tk.Button) and widget.cget("text") == "Run Recipe"):
                 widget.config(state=tk.DISABLED)
-
+        print("--")
         # Disable all other buttons in the ALD panel to prevent interference
         for widget in self.ald_panel.winfo_children():
-            if isinstance(widget, tk.Button) and widget.cget("text") != "Confirm":
-                widget.config(state=tk.DISABLED)
-
-        # Disable the Confirm button
+            print("Disabling")
+            if isinstance(widget, tk.Button):
+                if widget:
+                    widget.config(state=tk.DISABLED)
+            
         if self.confirm_button:
-            self.confirm_button.config(state=tk.DISABLED)
+            self.confirm_button.pack_forget()
 
         # Disable the manual control panel
         for widget in self.app.manual_control_panel.panel.winfo_children():
@@ -104,9 +107,11 @@ class ALDPanel:
         self.recipe_label.config(text="Status: Run in Progress")
 
         # Start the recipe run using the entered number of loops
-        self.app.ald_controller.create_run_thread(loops, self.app.valve_controller)
+        print(f"looops {loops.get()}")
+        self.app.ald_controller.create_run_thread(int(loops.get()), self.app.valve_controller)
 
         # Calculate runtime based on the entered number of loops
+        self.progressbar["value"] = 0
         self.update_progress_bar()
 
     def update_progress_bar(self):
@@ -115,15 +120,11 @@ class ALDPanel:
             self.progresstime["text"] = f"Time: {self.format_time(self.runtime - self.progressbar["value"])}"
             self.progressbar.after(1000, self.update_progress_bar)
         else:
-            self.progressbar["value"] = self.runtime
+            self.progressbar["value"] = self.runtime-0.001
             self.progresstime["text"] = f"Time: {self.format_time(0)}"
 
             # Re-enable manual control buttons
             self.enable_manual_controls()
-
-            # Re-enable the Confirm button
-            if self.confirm_button:
-                self.confirm_button.config(state=tk.NORMAL)
 
             # Re-enable the entry and Run Recipe button
             recipe_frame = self.recipe_label.master  # Get the parent frame of the recipe label
