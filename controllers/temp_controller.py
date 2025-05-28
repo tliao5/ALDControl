@@ -13,10 +13,10 @@ import threading
 from config import HEATER_CHANNELS, TEMP_CHANNELS
 
 class TempController:
-    def __init__(self):
+    def __init__(self,app):
         # log temperature controller intialized
         print("Temperature Controller Initializing")
-
+        self.app = app
         self.channels = HEATER_CHANNELS
         self.tempchannels = TEMP_CHANNELS
 
@@ -56,8 +56,7 @@ class TempController:
         return [h1dutycycle,h2dutycycle,h3dutycycle]
     
     def create_thermocouple_tasks(self):
-        logging.info("main reactor,inlet lower, inlet upper, exhaust,TMA,Trap,Gauges")
-        #logging.info("main reactor,inlet lower, inlet upper, exhaust,TMA,Trap,Gauges,Pressure")
+        self.app.logger.info("main reactor,inlet lower, inlet upper, exhaust,TMA,Trap,Gauges")
         tempchannels = ["ai0", "ai1", "ai2", "ai3", "ai4", "ai5", "ai6"]
         task = nidaqmx.Task("Thermocouple")
         for channel_name in tempchannels:
@@ -92,7 +91,6 @@ class TempController:
                 time.sleep(1/tps)
         
         # Close tasks after loop is told to stop by doing tc.stopthread.set() in main program
-        logging.info(f"Task {task.name}: Task Closing, Voltage set to False")
         task.write(False)
         task.stop()
         print(f"Task {task.name}: Task Closing, Voltage set to False")
@@ -105,10 +103,13 @@ class TempController:
                 print("Duty cycle updated")
                 # log duty cycle updated
                 queue.put(duty_value)
+                return duty_value
             else:
                 raise Exception()
         except:
             print(f"Invalid Input. Please enter an integer between 0 and {self.tps}.")   # turn into a log warning
+            queue.put(0)
+            return 0
   
     def close(self):
         self.stopthread.set()

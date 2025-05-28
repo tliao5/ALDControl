@@ -49,7 +49,7 @@ class ValveController:
         time.sleep(pulse_length)
         for t in tasks[::]:
             #print(t.name)
-            t.write(True)
+            t.write(False)
             t.stop()
         #print(f"Task {task.name}: False")
         #log valve pulsed

@@ -3,10 +3,12 @@ import numpy as np
 import logging
 import time
 import threading
+import queue
 
 class ALDController:
     def __init__(self):
         self.stopthread = threading.Event()
+        self.queue = queue.Queue()
     ### 
     # aldRun(file, loops, gvc) - executes an ALD Run
     # file - recipe file read in to program
@@ -14,12 +16,13 @@ class ALDController:
     # vc - gas_valve_controller() object
     ###
     def create_run_thread(self,loops,vc):
-        self.aldRunThread = threading.Thread(target=self.aldRun, args=(loops, vc))
+        self.aldRunThread = threading.Thread(target=self.aldRun, args=(loops, vc, self.queue))
         self.aldRunThread.start()
 
-    def aldRun(self, loops, vc):
+    def aldRun(self, loops, vc, queue):
         data = pd.read_csv(self.file)
         dataNP = data.to_numpy()
+        elapsed_time = 0
         print(vc.tasks)
         print(dataNP)
         # log run starting and recipe order
@@ -43,6 +46,8 @@ class ALDController:
                     #print(f"Purging: {dataNP[j,6]}")
                     time.sleep(dataNP[j][6])
                 previndices = indices
+                elapsed_time = elapsed_time+dataNP[j][6]
+                queue.put(elapsed_time)
                 #print()
         print("Run Over")
         vc.close_all() # make sure all valves are shut off at the end of a run
