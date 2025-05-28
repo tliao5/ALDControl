@@ -90,7 +90,6 @@ class ALDPanel:
         print("--")
         # Disable all other buttons in the ALD panel to prevent interference
         for widget in self.ald_panel.winfo_children():
-            print("Disabling")
             if isinstance(widget, tk.Button):
                 if widget:
                     widget.config(state=tk.DISABLED)
@@ -107,7 +106,6 @@ class ALDPanel:
         self.recipe_label.config(text="Status: Run in Progress")
 
         # Start the recipe run using the entered number of loops
-        print(f"looops {loops.get()}")
         self.app.ald_controller.create_run_thread(int(loops.get()), self.app.valve_controller)
 
         # Calculate runtime based on the entered number of loops
