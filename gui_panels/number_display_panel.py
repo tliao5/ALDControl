@@ -26,12 +26,18 @@ class NumberDisplayPanel:
             )
             button.pack(side=tk.LEFT, padx=5)
             self.heater_buttons[i] = button
-
+            
+        tk.Label(frame, text=f"Heater 3 - unused", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
+        tk.Label(frame, text=f"Heater 2 - Trap", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
+        tk.Label(frame, text=f"Heater 1 - Chamber", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
+ 
         return frame
 
     def set_duty_value(self, i, duty_cycle_var):
-        duty_cycle = int(duty_cycle_var.get())
-        if duty_cycle == 0:
+        duty_value = self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[i],duty_cycle_var)
+        if duty_value == 0:
             self.heater_buttons[i].config(bg=OFF_COLOR)
         else:
             self.heater_buttons[i].config(bg=ON_COLOR)
+            
+        

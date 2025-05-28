@@ -20,7 +20,7 @@ class PlotPanel:
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        ani = animation.FuncAnimation(self.fig, self.animate, interval=500)
+        ani = animation.FuncAnimation(self.fig, self.animate, interval=250, save_count=300)
         tempplot = FigureCanvasTkAgg(self.fig, frame)
         tempplot.draw()
         tempplot.get_tk_widget().grid(row=0, column=0, rowspan=40, columnspan=30, padx=10, pady=10, sticky=tk.NSEW)
@@ -54,7 +54,7 @@ class PlotPanel:
              # Read data from controllers
             tempdata = self.app.temp_controller.read_thermocouples()
             pressuredata = self.app.pressure_controller.read_pressure()
-            logging.info([tempdata, pressuredata])
+            self.app.logger.info(tempdata+ [pressuredata])
 
             self.pressure.append(round(pressuredata, 5))
             self.t_array.append(time.time() - self.t_start)

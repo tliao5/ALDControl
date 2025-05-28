@@ -14,15 +14,18 @@ class ManualControlPanel:
         self.panel = tk.Frame(parent, bg=BG_COLOR, width=700, highlightbackground=BORDER_COLOR, highlightthickness=1)
         parent.add(self.panel)
 
-        tk.Button(self.panel, text="Load File", font=FONT, bg=TEXT_COLOR, relief=BUTTON_STYLE, command=self.load_file).pack(padx=(10,350), pady=5, anchor=tk.NW)
-        self.label = tk.Label(self.panel, text="", bg=BG_COLOR, font=FONT)
-        self.label.pack(padx=20, pady=5, side=tk.TOP, anchor=tk.NW)
-
-        # Add Manual Control Button
+        # Manual Control Button
         tk.Button(
             self.panel, text="Manual Control", font=FONT, bg=TEXT_COLOR, relief=BUTTON_STYLE,
             command=self.open_manual_control
         ).pack(padx=10, pady=5, anchor=tk.NW)
+
+        # Load File Button
+        tk.Button(self.panel, text="Load File", font=FONT, bg=TEXT_COLOR, relief=BUTTON_STYLE, command=self.load_file).pack(padx=(10,350), pady=5, anchor=tk.NW)
+        self.label = tk.Label(self.panel, text="", bg=BG_COLOR, font=FONT)
+        self.label.pack(padx=20, pady=5, side=tk.TOP, anchor=tk.NW)
+
+        
 
     def load_file(self):
         file_path = filedialog.askopenfilename(title="Select a File", filetypes=[("CSV Files", "*.csv")])
@@ -38,8 +41,7 @@ class ManualControlPanel:
 
     def display_csv(self, file_path):
         if self.csv_panel:
-            for widget in self.csv_panel.winfo_children():
-                widget.destroy()
+            self.csv_panel.destroy()
         self.csv_panel = tk.Text(self.panel, wrap=tk.NONE, bg=TEXT_COLOR, height=10)
         self.csv_panel.pack(fill=tk.BOTH, expand=True)
         try:

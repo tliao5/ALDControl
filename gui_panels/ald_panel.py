@@ -6,6 +6,7 @@ import pandas as pd
 class ALDPanel:
     def __init__(self, app):
         self.app = app
+        self.queue = app.ald_controller.queue
         self.runtime = 0
         self.loops=tk.StringVar()
         self.progressbar = None
@@ -37,6 +38,9 @@ class ALDPanel:
         self.progresstime.pack(side=tk.LEFT, anchor=tk.NW, padx=20)
         self.progressbar = ttk.Progressbar(self.ald_panel, orient=tk.HORIZONTAL, length=400)
         self.progressbar.pack(pady=5, padx=30, anchor=tk.NW)
+        
+        # Log File
+        tk.Label(self.ald_panel, text=f"Log File Output: {LOG_FILE}", bg=BG_COLOR, font=FONT).pack(padx=20, pady=5, side=tk.TOP, anchor=tk.NW)
 
     def start_run(self):
         try:
@@ -60,8 +64,8 @@ class ALDPanel:
 
             # Clear progress bar and progress timer
             self.progressbar["value"] = 0
-            self.progresstime.config(text=f"Time: {self.format_time(0)}")
-            self.progressbar["max"]=self.runtime
+            self.progresstime.config(text=f"Estimated Time Left: {self.format_time(0)}")
+            self.progressbar["max"]=self.runtime+0.001
 
             # Display calculated runtime in the status label
             self.recipe_label.config(text=f"Status: Run for {loops} loops - Estimated Runtime: {self.format_time(self.runtime)}")
@@ -111,15 +115,24 @@ class ALDPanel:
         # Calculate runtime based on the entered number of loops
         self.progressbar["value"] = 0
         self.update_progress_bar()
+        
+        # Log run start
+        self.app.logger.info("Starting New Run")
 
     def update_progress_bar(self):
-        if self.progressbar["value"] + 1 <= self.runtime:
+        if not self.queue.empty(): # check for updates in queue
+            elapsed_time = int(self.queue.get(block=False))
+            print(f"Elapsed Time: {elapsed_time}")
+            self.progressbar["value"] = elapsed_time
+            self.progressbar.after(900, self.update_progress_bar)
+            self.progresstime["text"] = f"Estimated Time Left: {self.format_time(int(self.runtime - self.progressbar["value"]))}"
+        elif self.progressbar["value"] + 1 <= self.runtime:
             self.progressbar.step(1)
-            self.progresstime["text"] = f"Time: {self.format_time(self.runtime - self.progressbar["value"])}"
-            self.progressbar.after(1000, self.update_progress_bar)
+            self.progresstime["text"] = f"Estimated Time Left: {self.format_time(int(self.runtime - self.progressbar["value"]))}"
+            self.progressbar.after(900, self.update_progress_bar)
         else:
-            self.progressbar["value"] = self.runtime-0.001
-            self.progresstime["text"] = f"Time: {self.format_time(0)}"
+            self.progressbar["value"] = self.runtime
+            self.progresstime["text"] = f"Estimated Time Left: {self.format_time(0)}"
 
             # Re-enable manual control buttons
             self.enable_manual_controls()
@@ -131,7 +144,11 @@ class ALDPanel:
                     widget.config(state=tk.NORMAL)
 
             self.recipe_label.config(text="Status: Run Complete!")
+            self.app.logger.info("Timer Finished")
+            
             self.app.ald_controller.aldRunThread.join()
+            self.app.logger.info("ALD Thread Finished")
+            
 
     def format_time(self, seconds):
         hours, remainder = divmod(seconds, 3600)
@@ -149,3 +166,4 @@ class ALDPanel:
         for widget in self.app.manual_control_panel.panel.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.config(state=tk.NORMAL)
+        
