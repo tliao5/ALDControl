@@ -8,9 +8,16 @@ BUTTON_TEXT_COLOR = "grey80"
 BORDER_COLOR = "black"
 FONT = ("Helvetica", 16)
 
+
+# Log output
+LOG_FILE = "latencytest.log"
+
+
 # Pressure plot default y min and max
 Y_MIN_DEFAULT = 0.4
 Y_MAX_DEFAULT = 0.8
+
+
 
 MAIN_POWER_CHANNEL = "CDAQ1Mod4/line11"
 VALVE_CHANNELS = { "AV01": "cDAQ1Mod4/line0", # TMA
