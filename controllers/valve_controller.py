@@ -39,16 +39,16 @@ class ValveController:
         task.stop()
 
     def pulse_valve(self,indices,pulse_length):
-        print(indices[::])
+        #print(indices[::])
         tasks = [self.tasks[i] for i in indices]
-        print(tasks)
+        #print(tasks)
         for t in tasks[::]:
-            print(t.name)
+            #print(t.name)
             t.start()
             t.write(True)
         time.sleep(pulse_length)
         for t in tasks[::]:
-            print(t.name)
+            #print(t.name)
             t.write(True)
             t.stop()
         #print(f"Task {task.name}: False")
