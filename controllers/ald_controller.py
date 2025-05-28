@@ -28,22 +28,22 @@ class ALDController:
         for i in range(loops): #This is the number of loops the user wants to iterate the current file (ie - number of ALD cycles)
             if self.stopthread.isSet():
                     break
-            print(f"Loop: {i+1}")
+            print(f"Cycle: {i+1}/{loops}")
             for j in range(0,len(dataNP),1):#For each row in the .csv file, we want to set the experimental parameters accordingly
-                print(f"Row: {j+1}")
+                #print(f"Row: {j+1}")
                 if self.stopthread.isSet():
                     break
                 row = dataNP[j][:-1].tolist()
                 indices = [index for index, val in enumerate(row) if val == 1]
-                print(f"Row: {row}, Indices: {indices}, PrevIndices: {previndices}")
+                #print(f"Row: {row}, Indices: {indices}, PrevIndices: {previndices}")
                 indices = [index for index in indices if index not in previndices]
                 if indices:
                     vc.pulse_valve(indices,dataNP[j][6])
                 else:
-                    print(f"Purging: {dataNP[j,6]}")
+                    #print(f"Purging: {dataNP[j,6]}")
                     time.sleep(dataNP[j][6])
                 previndices = indices
-                print()
+                #print()
         print("Run Over")
         vc.close_all() # make sure all valves are shut off at the end of a run
 
