@@ -10,6 +10,7 @@ from controllers.valve_controller import ValveController
 from controllers.temp_controller import TempController
 from controllers.pressure_controller import PressureController
 from controllers.ald_controller import ALDController
+from controllers.mfc_reader import AlicatController
 
 import logging
 logging.basicConfig(filename=LOG_FILE,level=logging.INFO,format="%(asctime)s %(levelname)-8s %(message)s",datefmt="%m/%d/%Y %I:%M:%S %p")
@@ -31,6 +32,8 @@ class ALDApp(tk.Tk):
         self.temp_controller = TempController(self)
         self.pressure_controller = PressureController()
         self.ald_controller = ALDController()
+        self.alicat = alicat = AlicatController(port=MFC_PORT)
+        #self.alicat.change_setpoint(setpoint_value=0.0)
 
         # Initialize components
         self.main_power = MainPower(self)
@@ -39,11 +42,12 @@ class ALDApp(tk.Tk):
         self.ald_panel = ALDPanel(self)
         self.manual_control_panel = ManualControlPanel(self)
 
-        self.logger.info("GUI Initialized")
-
         # Layout
         self.create_layout()
+        
+        self.logger.info("ALD Control Initialized")
 
+        
     def create_layout(self):
         # Outer frame
         outer_frame = tk.Frame(self, bg=BG_COLOR, highlightbackground=TEXT_COLOR, highlightthickness=5)

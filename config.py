@@ -10,12 +10,12 @@ FONT = ("Helvetica", 16)
 
 
 # Log output
-LOG_FILE = "latencytest.log"
+LOG_FILE = "log_test.log"
 
 
 # Pressure plot default y min and max
-Y_MIN_DEFAULT = 0.4
-Y_MAX_DEFAULT = 0.8
+Y_MIN_DEFAULT = 0.001
+Y_MAX_DEFAULT = 0.100
 
 
 
@@ -27,3 +27,5 @@ HEATER_CHANNELS = { "h1channel": "CDAQ1Mod4/port0/line5", # heater 1
                           "h2channel": "CDAQ1Mod4/port0/line6", # heater 2
                           "h3channel": "CDAQ1Mod4/port0/line7"} # heater 3
 TEMP_CHANNELS = ["ai0", "ai1", "ai2", "ai3", "ai4", "ai5", "ai6"]
+
+MFC_PORT = "COM6"
