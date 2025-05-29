@@ -45,6 +45,7 @@ class ValveController:
         for t in tasks[::]:
             #print(t.name)
             t.start()
+            t.start()
             t.write(True)
         time.sleep(pulse_length)
         for t in tasks[::]:

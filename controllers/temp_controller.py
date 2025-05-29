@@ -87,7 +87,7 @@ class TempController:
                 if voltageold != voltage: # check if voltage should change from 1->0 or 0->1
                     voltageold = voltage
                     task.write(voltage) # send update signal to DAQ
-                    print(f"{task.name}: "+str(voltage))
+                    #print(f"{task.name}: "+str(voltage))
                 time.sleep(1/tps)
         
         # Close tasks after loop is told to stop by doing tc.stopthread.set() in main program
