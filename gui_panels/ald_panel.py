@@ -91,7 +91,6 @@ class ALDPanel:
         for widget in recipe_frame.winfo_children():
             if isinstance(widget, tk.Entry) or (isinstance(widget, tk.Button) and widget.cget("text") == "Run Recipe"):
                 widget.config(state=tk.DISABLED)
-        print("--")
         # Disable all other buttons in the ALD panel to prevent interference
         for widget in self.ald_panel.winfo_children():
             if isinstance(widget, tk.Button):
@@ -122,7 +121,7 @@ class ALDPanel:
     def update_progress_bar(self):
         if not self.queue.empty(): # check for updates in queue
             elapsed_time = int(self.queue.get(block=False))
-            print(f"Elapsed Time: {elapsed_time}")
+            #print(f"Elapsed Time: {elapsed_time}")
             self.progressbar["value"] = elapsed_time
             self.progressbar.after(900, self.update_progress_bar)
             self.progresstime["text"] = f"Estimated Time Left: {self.format_time(int(self.runtime - self.progressbar["value"]))}"
@@ -144,10 +143,8 @@ class ALDPanel:
                     widget.config(state=tk.NORMAL)
 
             self.recipe_label.config(text="Status: Run Complete!")
-            self.app.logger.info("Timer Finished")
-            
             self.app.ald_controller.aldRunThread.join()
-            self.app.logger.info("ALD Thread Finished")
+            self.app.logger.info("ALD Run Finished")
             
 
     def format_time(self, seconds):
