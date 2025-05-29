@@ -11,26 +11,26 @@ class NumberDisplayPanel:
         d1 = tk.StringVar()
         d2 = tk.StringVar()
         d3 = tk.StringVar()
-        d = [d1, d2, d3]
+        self.duty = [d1, d2, d3]
 
-        """autoset = tk.Frame(frame,bg=BG_COLOR,pady=10)
-        autoset.pack(fill=tk.X,padx=10,pady=5)
+        self.autoset_frame = tk.Frame(frame,bg=BG_COLOR,pady=10)
+        self.autoset_frame.pack(fill=tk.X,padx=10,pady=5)
         autoset_temp=tk.StringVar()
-        tk.Label(autoset, text ="Autoset Temp", bg=BG_COLOR, font=FONT).pack(side=tk.LEFT,anchor=tk.NW,padx=5,pady=5)
-        tk.Entry(autoset,width=10,font=FONT,textvariable=autoset_temp).pack(side=tk.LEFT,anchor=tk.NW,padx=5)
-        self.setpoint_button = tk.Button(mfc,text="Autoset",font=FONT,bg=OFF_COLOR,fg=BUTTON_TEXT_COLOR,relief=BUTTON_STYLE,command=lambda:self.change_autoset(autoset_temp))
-        self.setpoint_button.pack(side=tk.LEFT,padx=5)"""
+        tk.Label(self.autoset_frame, text ="Autoset Temp", bg=BG_COLOR, font=FONT).pack(side=tk.LEFT,anchor=tk.NW,padx=5,pady=5)
+        tk.Entry(self.autoset_frame,width=10,font=FONT,textvariable=autoset_temp).pack(side=tk.LEFT,anchor=tk.NW,padx=5)
+        self.autoset_button = tk.Button(self.autoset_frame,text="Autoset",font=FONT,bg=OFF_COLOR,fg=BUTTON_TEXT_COLOR,relief=BUTTON_STYLE,command=lambda:self.change_autoset(autoset_temp))
+        self.autoset_button.pack(side=tk.LEFT,padx=5)
 
         for i in range(3):
-            d[i].set(0)
+            self.duty[i].set(0)
             row = tk.Frame(frame, bg=BG_COLOR, pady=10)
             row.pack(fill=tk.X, padx=10, pady=5)
             tk.Label(row, text=f"Heater {i+1}:", bg=BG_COLOR, font=FONT).pack(side=tk.LEFT, padx=5)
-            tk.Entry(row, width=10, font=FONT, textvariable=d[i]).pack(side=tk.LEFT, padx=5)
+            tk.Entry(row, width=10, font=FONT, textvariable=self.duty[i]).pack(side=tk.LEFT, padx=5)
 
             button = tk.Button(
                 row, text="Set", font=FONT, bg=OFF_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
-                command=lambda i=i: self.set_duty_value(i, d[i])
+                command=lambda i=i: self.set_duty_value(i, self.duty[i])
             )
             button.pack(side=tk.LEFT, padx=5)
             self.heater_buttons[i] = button
@@ -79,18 +79,37 @@ class NumberDisplayPanel:
         self.flowrate_label.after(1000, self.update_setpoint_reading)
         
     def change_autoset(self, autoset_temp_var):
-        try:
-            autoset_temp = int(autoset_temp_var.get())
-            if autoset_temp == 0:
-                self.setpoint_button.config(bg=OFF_COLOR)
-            elif setpt>0:
-                self.update_autoset(autoset_temp)
-            else:
-                raise Exception
-        except:
-            print("Invalid Autoset")
+        
+        autoset_temp = int(autoset_temp_var.get())
+        duty = self.duty[0]
+        if self.setpoint_button["bg"] == ON_COLOR or autoset_temp == 0:
+            print("Autoset Disabled")
+            self.autoset_button.config(bg=OFF_COLOR)
+            self.heater_buttons[0].config(state=tk.NORMAL)
+            self.autoset = False
+        elif autoset_temp > 0:
+            print("Autoset Enabled")
+            self.autoset = True
+            self.autoset_button.config(bg=ON_COLOR)
+            self.update_autoset(autoset_temp,duty)
+            self.heater_buttons[0].config(state=tk.DISABLED)
+        else:
+            pass
+        #    raise Exception()
+        #except:
+        #    print("Invalid Autoset")
     
-    """def update_autoset(self,autoset_temp)
+    def update_autoset(self,autoset_temp, duty):
         current_temp = self.app.temp_controller.read_thermocouples()[0]
-        duty = d[1]
-        if current_temp < (self.app.temp_controller.queues[i],duty)"""
+        if autoset_temp <= current_temp:
+            print(f"{current_temp} temp too high, target: {autoset_temp}")
+            self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[0],duty)
+            print(duty.get())
+        elif autoset_temp > current_temp:
+            print(f"{current_temp} temp too low, target: {autoset_temp}")
+            d = tk.StringVar()
+            d.set(int(duty.get())+1)
+            self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[0],d)
+            print(d.get())
+        if self.autoset == True:
+            self.autoset_frame.after(10000,lambda : self.update_autoset(autoset_temp,duty))
