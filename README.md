@@ -9,7 +9,8 @@ The ALD Control software controls these aspects of the ALD Reactor
    └ Alicat Mass Flow Controller – Carrier Gas Flow  
   
 The control application uses Python’s Tkinter package and consists of the below component  
-    +==========================================================================================+  
+'''
++==========================================================================================+  
     app.py – The main program loop, also initializes of all controllers and GUI Panels  
     ╚ controllers	================= control different aspects of the reactor, using nidaqmx functionality  
        └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start  
@@ -24,6 +25,7 @@ The control application uses Python’s Tkinter package and consists of the belo
        └ number_display_panel -----– heater and mass flow control  
        └ plot_panel ----------------  real time display of pressures and temperatures  
     +===========================================================================================+  
+'''
   
   
 How to start a run:
