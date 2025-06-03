@@ -6,7 +6,7 @@ The ALD Control software controls these aspects of the ALD Reactor
    └ MKS Baratron – Pressure Reading  
    └ Band Heaters – System Temperature Control  
    └ Swagelok ALD Valves – Run Cycle Control  
-   └ Alicat Mass Flow Controller – Carrier Gas Flow  
+╚ Alicat Mass Flow Controller – Carrier Gas Flow  
   
 The control application uses Python’s Tkinter package and consists of the below component  
 ```
