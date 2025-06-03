@@ -1,31 +1,31 @@
-# ALDControl
-ALD Control System Overview – Tyler Liao
-The ALD Control software controls these aspects of the ALD Reactor
-╚ Via NI DAQ
-   └ Thermocouples – Temperature Reading
-   └ MKS Baratron – Pressure Reading
-   └ Band Heaters – System Temperature Control
-   └ Swagelok ALD Valves – Run Cycle Control
-   └ Alicat Mass Flow Controller – Carrier Gas Flow
-
-The control application uses Python’s Tkinter package and consists of the below component
-+===============================================================================================================+
-| app.py – The main program loop, also initializes of all controllers and GUI Panels				                    |
-| ╚ controllers	================= control different aspects of the reactor, using nidaqmx functionality			    |
-|   └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start							            |
-|   └ mfc_reader ---------------– Alicat flow control interface													                        |
-|   └ pressure_controller ------– pressure reading from MKS Baratron											                      |
-|   └ temp_controller ----------– temperature reading from thermocouples, creates 3 threads to control heaters.	|
-|   └ valve_controller ---------– logic to open, close, and pulse valves										                    |
-| ╚ gui_panel =================== allow the user to interface with the controllers								              |
-|   └ main_power ---------------- button that turns on and off the main power relay								              |
-|   └ ald_panel ----------------- run start controls															                              |
-|   └ manual_control_panel -----– manual ALD valve control and file loading										                  | 
-|   └ number_display_panel -----– heater and mass flow control													                        |
-|   └ plot_panel ----------------  real time display of pressures and temperatures								              |
-+===============================================================================================================+
-
-
+# ALDControl  
+ALD Control System Overview – Tyler Liao  
+The ALD Control software controls these aspects of the ALD Reactor  
+╚ Via NI DAQ  
+   └ Thermocouples – Temperature Reading  
+   └ MKS Baratron – Pressure Reading  
+   └ Band Heaters – System Temperature Control  
+   └ Swagelok ALD Valves – Run Cycle Control  
+   └ Alicat Mass Flow Controller – Carrier Gas Flow  
+  
+The control application uses Python’s Tkinter package and consists of the below component  
++===============================================================================================================+  
+| app.py – The main program loop, also initializes of all controllers and GUI Panels				                    |  
+| ╚ controllers	================= control different aspects of the reactor, using nidaqmx functionality			    |  
+|   └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start							            |  
+|   └ mfc_reader ---------------– Alicat flow control interface													                        |  
+|   └ pressure_controller ------– pressure reading from MKS Baratron											                      |  
+|   └ temp_controller ----------– temperature reading from thermocouples, creates 3 threads to control heaters.	|  
+|   └ valve_controller ---------– logic to open, close, and pulse valves										                    |  
+| ╚ gui_panel =================== allow the user to interface with the controllers								              |  
+|   └ main_power ---------------- button that turns on and off the main power relay								              |  
+|   └ ald_panel ----------------- run start controls															                              |  
+|   └ manual_control_panel -----– manual ALD valve control and file loading										                  |   
+|   └ number_display_panel -----– heater and mass flow control													                        |  
+|   └ plot_panel ----------------  real time display of pressures and temperatures								              |  
++===============================================================================================================+  
+  
+  
 How to start a run:
 1. Doublecheck config file to make sure log file, etc. are correct
 2. Run app.py in command line
