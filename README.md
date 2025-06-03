@@ -10,7 +10,6 @@ The ALD Control software controls these aspects of the ALD Reactor
   
 The control application uses Python’s Tkinter package and consists of the below component  
 ```
-    +==========================================================================================+  
     app.py – The main program loop, also initializes of all controllers and GUI Panels  
     ╚ controller ================== control different aspects of the reactor, using nidaqmx functionality  
        └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start  
@@ -24,7 +23,6 @@ The control application uses Python’s Tkinter package and consists of the belo
        └ manual_control_panel -----– manual ALD valve control and file loading  
        └ number_display_panel -----– heater and mass flow control  
        └ plot_panel ----------------  real time display of pressures and temperatures  
-    +===========================================================================================+  
 ```
   
 How to start a run:
