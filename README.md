@@ -1,5 +1,5 @@
 # ALDControl  
-ALD Control System Overview – Tyler Liao  
+ALD Control System Overview
 The ALD Control software controls these aspects of the ALD Reactor  
 ╚ Via NI DAQ  
    └ Thermocouples – Temperature Reading  
