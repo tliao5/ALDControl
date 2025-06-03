@@ -11,17 +11,7 @@ class PressureController:
         self.ptask = nidaqmx.Task("Pressure")
         self.ptask.ai_channels.add_ai_voltage_chan(pressure_sensor_channel["Pchannel"], min_val=-10.0, max_val=10.0)
         self.ptask.start()
-        # Add flow controller functionality?
-
         #log pressure controller initialized
-
-    #def set_flow_rate():
-    
-    #def read_cfm():
-
-    #def log_pressure():
-
-    #def log_cfm():
 
     def read_pressure(self):
         voltage = self.ptask.read()
