@@ -10,9 +10,9 @@ The ALD Control software controls these aspects of the ALD Reactor
   
 The control application uses Python’s Tkinter package and consists of the below component  
 +===============================================================================================================+  
-| app.py – The main program loop, also initializes of all controllers and GUI Panels				                    |  
-| ╚ controllers	================= control different aspects of the reactor, using nidaqmx functionality			    |  
-|   └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start							            |  
+| app.py – The main program loop, also initializes of all controllers and GUI Panels                            |  
+| ╚ controllers	================= control different aspects of the reactor, using nidaqmx functionality         |  
+|   └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start                          |  
 |   └ mfc_reader ---------------– Alicat flow control interface													                        |  
 |   └ pressure_controller ------– pressure reading from MKS Baratron											                      |  
 |   └ temp_controller ----------– temperature reading from thermocouples, creates 3 threads to control heaters.	|  
