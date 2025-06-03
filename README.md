@@ -12,7 +12,7 @@ The control application uses Python’s Tkinter package and consists of the belo
 ```
 +==========================================================================================+  
     app.py – The main program loop, also initializes of all controllers and GUI Panels  
-    ╚ controllers	================= control different aspects of the reactor, using nidaqmx functionality  
+    ╚ controller ================== control different aspects of the reactor, using nidaqmx functionality  
        └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start  
        └ mfc_reader ---------------– Alicat flow control interface  
        └ pressure_controller ------– pressure reading from MKS Baratron  
