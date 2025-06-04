@@ -22,38 +22,25 @@ class TempController:
 
         self.tps = 200 # ticks per second for duty cycles
 
-        self.queues = self.create_heater_queue()
+        self.queues = [queue.Queue() for i in range(len(HEATER_CHANNELS))]
         self.tasks = self.create_heater_tasks()
         self.threads = self.start_threads()
         self.thermocoupletask = self.create_thermocouple_tasks()
 
-    def create_heater_queue(self):
-        h1queue = queue.Queue()
-        h2queue = queue.Queue()
-        h3queue = queue.Queue()
-        return [h1queue,h2queue,h3queue]
-
     def create_heater_tasks(self):
-        h1task = nidaqmx.Task("Heater 1")
-        h2task = nidaqmx.Task("Heater 2")
-        h3task = nidaqmx.Task("Heater 3")
-
-        h1task.do_channels.add_do_chan(self.channels["h1channel"], line_grouping=LineGrouping.CHAN_PER_LINE)
-        h2task.do_channels.add_do_chan(self.channels["h2channel"], line_grouping=LineGrouping.CHAN_PER_LINE)
-        h3task.do_channels.add_do_chan(self.channels["h3channel"], line_grouping=LineGrouping.CHAN_PER_LINE)
-        return [h1task,h2task,h3task]
+        tasks = [nidaqmx.Task(f"Heater {i+1}") for i in range(len(HEATER_CHANNELS))]
+        for i in range(len(HEATER_CHANNELS)):
+            tasks[i].do_channels.add_do_chan(self.channels[f"h{i+1}channel"], line_grouping=LineGrouping.CHAN_PER_LINE)
+        return tasks
 
     def start_threads(self):
         # Create Duty Cycle threads
         self.stopthread = threading.Event()
-
-        h1dutycycle = threading.Thread(target=self.duty_cycle, args=(self.stopthread, self.queues[0], self.tasks[0], self.tps))
-        h2dutycycle = threading.Thread(target=self.duty_cycle, args=(self.stopthread, self.queues[1], self.tasks[1], self.tps))
-        h3dutycycle = threading.Thread(target=self.duty_cycle, args=(self.stopthread, self.queues[2], self.tasks[2], self.tps))
-        h1dutycycle.start()
-        h2dutycycle.start()
-        h3dutycycle.start()
-        return [h1dutycycle,h2dutycycle,h3dutycycle]
+        duty_cycles = [threading.Thread() for i in range(len(HEATER_CHANNELS))]
+        for i in range(len(HEATER_CHANNELS)):
+            duty_cycles[i] = threading.Thread(target=self.duty_cycle, args=(self.stopthread, self.queues[i], self.tasks[i], self.tps))
+            duty_cycles[i].start()
+        return duty_cycles
     
     def create_thermocouple_tasks(self):
         self.app.logger.info("main reactor,inlet lower, inlet upper, exhaust,TMA,Trap,Gauges")
