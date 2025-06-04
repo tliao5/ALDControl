@@ -24,8 +24,9 @@ VALVE_CHANNELS = { "AV01": "cDAQ1Mod4/line0", # TMA
                    "AV02": "CDAQ1Mod4/line1", # D20
                    "AV03": "CDAQ1Mod4/line2"} # H20                      
 HEATER_CHANNELS = { "h1channel": "CDAQ1Mod4/port0/line5", # heater 1
-                          "h2channel": "CDAQ1Mod4/port0/line6", # heater 2
-                          "h3channel": "CDAQ1Mod4/port0/line7"} # heater 3
+                    "h2channel": "CDAQ1Mod4/port0/line6", # heater 2
+                    "h3channel": "CDAQ1Mod4/port0/line7", # heater 3
+                    "h4channel": "CDAQ1Mod4/port0/line8"} # heater 4
 TEMP_CHANNELS = ["ai0", "ai1", "ai2", "ai3", "ai4", "ai5", "ai6"]
 
 MFC_PORT = "COM6"
