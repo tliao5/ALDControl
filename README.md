@@ -40,7 +40,7 @@ Notes:
 - The main plot shown is Pressure vs. Samples, not Pressure vs. Time
 	- This is coming from the MKS Baratron which takes a sample approximately once per second, but timing is variable
 
-- There are two timers that are active during a run, the main thread elapsed_time, and the aldRun thread's elapsed time, I force them to sync, but may update how this is arranged in the future
+- There are two timers that are active during a run, the main thread elapsed_time, and the aldRun thread's elapsed time. I force them to sync, but may update how this is arranged in the future
 
 - app.py runs in the main thread
     - aldRun ------ main run thread
@@ -86,9 +86,9 @@ ald_controller() ALD Run cycle logic
     	- vc = valve_controller object 
     
     - aldRun(self,loops,vc,queue) pulses valves at time specified by recipe file
-    	- loops = number of ALD cycles specified by user
-	- vc = valve_controller object
-	- queue = ald_controller's queue, right now used to pass elapsed time
+        - loops = number of ALD cycles specified by user
+        - vc = valve_controller object
+        - queue = ald_controller's queue, right now used to pass elapsed time
 	
 	- accesses recipe file stored in ald_controller.file
 	- for i in range(loops) -------------------- based on number of cycles
