@@ -37,14 +37,16 @@ How to start a run:
 
 Notes:
 - Currently logging is done at each update call of the animate() function from plot_panel
+- The main plot shown is Pressure vs. Samples, not Pressure vs. Time
+	- This is coming from the MKS Baratron which takes a sample approximately once per second, but timing is variable
 
 - There are two timers that are active during a run, the main thread elapsed_time, and the aldRun thread's elapsed time, I force them to sync, but may update how this is arranged in the future
 
 - app.py runs in the main thread
     - aldRun ------ main run thread
     - h1dutycycle - controls heater 1 duty cycle
-    - h2dutycycle - controls heater 1 duty cycle
-    - h3dutycycle - controls heater 1 duty cycle
+    - h2dutycycle - controls heater 2 duty cycle
+    - h3dutycycle - controls heater 3 duty cycle
 -  .after() events: consistent updates to other parts of the system using tkinter's built in event queue .after() function
     - ald_panel.update_progress_bar() - calls every "900ms" but likely a bit slower due to latency, ticks down main thread run timer
     - number_display_panel.update_setpoint_reading(self) - calls ever "1000ms", could probably be less frequent
