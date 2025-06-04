@@ -13,6 +13,7 @@ class NumberDisplayPanel:
         d3 = tk.StringVar()
         self.duty = [d1, d2, d3]
 
+        '''
         self.autoset_frame = tk.Frame(frame,bg=BG_COLOR,pady=10)
         self.autoset_frame.pack(fill=tk.X,padx=10,pady=5)
         autoset_temp=tk.StringVar()
@@ -20,6 +21,7 @@ class NumberDisplayPanel:
         tk.Entry(self.autoset_frame,width=10,font=FONT,textvariable=autoset_temp).pack(side=tk.LEFT,anchor=tk.NW,padx=5)
         self.autoset_button = tk.Button(self.autoset_frame,text="Autoset",font=FONT,bg=OFF_COLOR,fg=BUTTON_TEXT_COLOR,relief=BUTTON_STYLE,command=lambda:self.change_autoset(autoset_temp))
         self.autoset_button.pack(side=tk.LEFT,padx=5)
+        '''
 
         for i in range(3):
             self.duty[i].set(0)
@@ -78,6 +80,7 @@ class NumberDisplayPanel:
         self.flowrate_label.config(text=f"Flowrate: {flowrate}")
         self.flowrate_label.after(1000, self.update_setpoint_reading)
         
+    '''
     def change_autoset(self, autoset_temp_var):
         
         autoset_temp = int(autoset_temp_var.get())
@@ -113,3 +116,4 @@ class NumberDisplayPanel:
             print(d.get())
         if self.autoset == True:
             self.autoset_frame.after(10000,lambda : self.update_autoset(autoset_temp,duty))
+    '''
