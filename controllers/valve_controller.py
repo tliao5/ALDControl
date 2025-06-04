@@ -15,13 +15,10 @@ class ValveController:
         # log valve controller initialized
         
     def create_valve_tasks(self):
-        AV01 = nidaqmx.Task("AV01")
-        AV02 = nidaqmx.Task("AV02")
-        AV03 = nidaqmx.Task("AV03")
-        AV01.do_channels.add_do_chan(self.valvechannels["AV01"], line_grouping=LineGrouping.CHAN_PER_LINE)
-        AV02.do_channels.add_do_chan(self.valvechannels["AV02"], line_grouping=LineGrouping.CHAN_PER_LINE)
-        AV03.do_channels.add_do_chan(self.valvechannels["AV03"], line_grouping=LineGrouping.CHAN_PER_LINE)
-        return [AV01, AV02, AV03]
+        valves = [nidaqmx.Task(f"AV0{i+1}") for i in range(len(VALVE_CHANNELS))]
+        for i in range(len(VALVE_CHANNELS)):
+            valves[i].do_channels.add_do_chan(self.valvechannels[f"AV0{i+1}"], line_grouping=LineGrouping.CHAN_PER_LINE)
+        return valves
 
         
     def open_valve(self,task):
