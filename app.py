@@ -47,7 +47,6 @@ class ALDApp(tk.Tk):
         
         self.logger.info("ALD Control Initialized")
 
-        
     def create_layout(self):
         # Outer frame
         outer_frame = tk.Frame(self, bg=BG_COLOR, highlightbackground=TEXT_COLOR, highlightthickness=5)

@@ -10,12 +10,12 @@ FONT = ("Helvetica", 16)
 
 
 # Log output
-LOG_FILE = "log_test.log"
+LOG_FILE = "PressureTempJune.log"
 
 
 # Pressure plot default y min and max
-Y_MIN_DEFAULT = 0.001
-Y_MAX_DEFAULT = 0.100
+Y_MIN_DEFAULT = 0.450
+Y_MAX_DEFAULT = 0.650
 
 
 
