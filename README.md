@@ -43,13 +43,13 @@ Notes:
 - There are two timers that are active during a run, the main thread elapsed_time, and the aldRun thread's elapsed time. I force them to sync, but may update how this is arranged in the future
 
 - app.py runs in the main thread
-    - aldRun ------ main run thread
+    - aldRun ------ ALD run thread
     - h1dutycycle - controls heater 1 duty cycle
     - h2dutycycle - controls heater 2 duty cycle
     - h3dutycycle - controls heater 3 duty cycle
 -  .after() events: consistent updates to other parts of the system using tkinter's built in event queue .after() function
-    - ald_panel.update_progress_bar() - calls every "900ms" but likely a bit slower due to latency, ticks down main thread run timer
-    - number_display_panel.update_setpoint_reading(self) - calls ever "1000ms", could probably be less frequent
+    - ald_panel.update_progress_bar() - calls every "900ms" but likely a bit slower due to latency, controls run timer in the main thread
+    - number_display_panel.update_setpoint_reading(self) - calls every "1000ms", could probably be less frequent
 
 - All threads and tasks should close automatically when the program is closed, but may take some time
 
