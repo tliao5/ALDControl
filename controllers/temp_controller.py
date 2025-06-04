@@ -87,7 +87,7 @@ class TempController:
         try:
             duty_value = int(duty.get()) ## fix back when updating for ttk interface
             if 0 <= duty_value <= self.tps:
-                print("Duty cycle updated")
+                print(f"Duty cycle updated to {duty_value}")
                 # log duty cycle updated
                 queue.put(duty_value)
                 return duty_value
