@@ -4,7 +4,7 @@ TEXT_COLOR = "white"
 ON_COLOR = "green"
 OFF_COLOR = "red4"
 BUTTON_STYLE = "raised"
-BUTTON_TEXT_COLOR = "grey80"
+BUTTON_TEXT_COLOR = "grey85"
 BORDER_COLOR = "black"
 FONT = ("Helvetica", 16)
 
