@@ -4,13 +4,14 @@ from config import *
 class NumberDisplayPanel:
     def __init__(self, app):
         self.app = app
-        self.heater_buttons = ["", "", ""]
-
+        
     def create_number_display_panel(self):
         frame = tk.Frame(bg=BG_COLOR, highlightbackground=BORDER_COLOR, highlightthickness=1)
         
         self.duty = [tk.StringVar() for i in range(len(HEATER_CHANNELS))]
-
+        
+        self.heater_buttons = [tk.Button() for i in range(len(HEATER_CHANNELS))]
+        
         # Create heater buttons
         self.heater_buttons = [tk.Button() for i in range(len(HEATER_CHANNELS))]
         for i in range(len(HEATER_CHANNELS)):
