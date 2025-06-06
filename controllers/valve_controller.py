@@ -10,9 +10,11 @@ from config import VALVE_CHANNELS
 # currently hard coded for the three valves of this ALD system
 class ValveController:
     def __init__(self):
+        print("Valve Controller Initialized")
         self.valvechannels = VALVE_CHANNELS
         self.tasks = self.create_valve_tasks()
         # log valve controller initialized
+        print("Valve Controller Initialized")
         
     def create_valve_tasks(self):
         valves = [nidaqmx.Task(f"AV0{i+1}") for i in range(len(VALVE_CHANNELS))]

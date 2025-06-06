@@ -23,9 +23,12 @@ class TempController:
         self.tps = 200 # ticks per second for duty cycles
 
         self.queues = [queue.Queue() for i in range(len(HEATER_CHANNELS))]
+        self.autoset_queue = queue.Queue()
+        self.current_temp_queue = queue.Queue()
         self.tasks = self.create_heater_tasks()
         self.threads = self.start_threads()
         self.thermocoupletask = self.create_thermocouple_tasks()
+        print("Temperature Controller Initialized")
 
     def create_heater_tasks(self):
         tasks = [nidaqmx.Task(f"Heater {i+1}") for i in range(len(HEATER_CHANNELS))]
@@ -36,10 +39,13 @@ class TempController:
     def start_threads(self):
         # Create Duty Cycle threads
         self.stopthread = threading.Event()
+        self.autoset = threading.Event()
         duty_cycles = [threading.Thread() for i in range(len(HEATER_CHANNELS))]
-        for i in range(len(HEATER_CHANNELS)):
-            duty_cycles[i] = threading.Thread(target=self.duty_cycle, args=(self.stopthread, self.queues[i], self.tasks[i], self.tps))
-            duty_cycles[i].start()
+        duty_cycles[0] = threading.Thread(target=self.autoset_duty_cycle, args=(self.stopthread, self.queues[0], self.tasks[0], self.tps))
+        duty_cycles[0].start()
+        for i in range(len(HEATER_CHANNELS)-1):
+            duty_cycles[i+1] = threading.Thread(target=self.duty_cycle, args=(self.stopthread, self.queues[i+1], self.tasks[i+1], self.tps))
+            duty_cycles[i+1].start()
         return duty_cycles
     
     def create_thermocouple_tasks(self):
@@ -60,6 +66,42 @@ class TempController:
 
     #def log_temps
 
+    def autoset_duty_cycle(self,stopthread, duty_queue, task, tps):
+        task.start()
+        voltageold = False # default voltage state
+        duty_queue.put(0) # default duty
+        current_temp = 0
+        autoset_temp = 0
+        while not stopthread.is_set(): # loop until tc.stopthread.set()
+            if not duty_queue.empty(): # check for updates in queue
+                set_duty = duty_queue.get(block=False)
+            
+            if not self.current_temp_queue.empty(): # check for updates in queue
+               current_temp = self.current_temp_queue.get(block=False)
+            if not self.autoset_queue.empty(): # check for updates in queue
+                autoset_temp = self.autoset_queue.get(block=False)
+            
+            if self.autoset.is_set() and current_temp > autoset_temp - 0.5:
+                duty = set_duty-1
+            else:
+                duty = set_duty
+            #print(f"Current Temp: {current_temp}, Autoset Temp: {autoset_temp}, Autoset: {self.autoset.is_set()}")
+            #print(f"Duty : {duty}")
+            # Duty Cycle
+            for i in range(tps):
+                voltage = i < duty
+                if voltageold != voltage: # check if voltage should change from 1->0 or 0->1
+                    voltageold = voltage
+                    task.write(voltage) # send update signal to DAQ
+                    #print(f"{task.name}: "+str(voltage))
+                time.sleep(1/tps)
+        
+        # Close tasks after loop is told to stop by doing tc.stopthread.set() in main program
+        task.write(False)
+        task.stop()
+        print(f"Task {task.name}: Task Closing, Voltage set to False")
+        task.close()
+    
     def duty_cycle(self,stopthread, duty_queue, task, tps):
         task.start()
         voltageold = False # default voltage state
@@ -87,8 +129,11 @@ class TempController:
         try:
             duty_value = int(duty.get()) ## fix back when updating for ttk interface
             if 0 <= duty_value <= self.tps:
-                print(f"Duty cycle updated to {duty_value}")
+                print(f"Duty cycle updated {duty_value}")
                 # log duty cycle updated
+                while not queue.empty():
+                    queue.get()
+                    print("get")
                 queue.put(duty_value)
                 return duty_value
             else:

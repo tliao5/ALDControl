@@ -9,8 +9,10 @@ class AlicatController:
         :param baudrate: Baud rate of the device (default: 19200)
         :param timeout: Read timeout in seconds
         """
+        print("MFC Initializing")
         self.ser = serial.Serial(port, baudrate, timeout=timeout)
         time.sleep(2)  # initialize the serial connection
+        print("MFC Initialized")
  
     def send_command(self, command):
         """

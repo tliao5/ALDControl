@@ -7,18 +7,21 @@ import queue
 
 class ALDController:
     def __init__(self):
+        print("ALD Recipe Controller Initializing")
         self.stopthread = threading.Event()
         self.queue = queue.Queue()
+        print("ALD Recipe Controller Initialized")
+        
+    def create_run_thread(self,loops,vc):
+        self.aldRunThread = threading.Thread(target=self.aldRun, args=(loops, vc, self.queue))
+        self.aldRunThread.start()
+
     ### 
     # aldRun(file, loops, gvc) - executes an ALD Run
     # file - recipe file read in to program
     # loops - number of times to loop through the recipe
     # vc - gas_valve_controller() object
     ###
-    def create_run_thread(self,loops,vc):
-        self.aldRunThread = threading.Thread(target=self.aldRun, args=(loops, vc, self.queue))
-        self.aldRunThread.start()
-
     def aldRun(self, loops, vc, queue):
         data = pd.read_csv(self.file)
         dataNP = data.to_numpy()
@@ -31,7 +34,7 @@ class ALDController:
         for i in range(loops): #This is the number of loops the user wants to iterate the current file (ie - number of ALD cycles)
             if self.stopthread.isSet():
                     break
-            print(f"Cycle: {i+1}/{loops}")
+            #print(f"Cycle: {i+1}/{loops}")
             for j in range(0,len(dataNP),1):#For each row in the .csv file, we want to set the experimental parameters accordingly
                 #print(f"Row: {j+1}")
                 if self.stopthread.isSet():
