@@ -49,7 +49,8 @@ class NumberDisplayPanel:
         self.flowrate_label.pack(side=tk.TOP,anchor=tk.NW,padx=20,pady=5)
         self.update_setpoint_reading()
             
-        tk.Label(frame, text=f"Heater 3 - unused", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
+        tk.Label(frame, text=f"Heater 4 - TMA, gauges", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
+        tk.Label(frame, text=f"Heater 3 - Inlet", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
         tk.Label(frame, text=f"Heater 2 - Trap", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
         tk.Label(frame, text=f"Heater 1 - Chamber", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
  
