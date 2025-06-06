@@ -20,7 +20,7 @@ class PlotPanel:
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        ani = animation.FuncAnimation(self.fig, self.animate, interval=250, save_count=300)
+        ani = animation.FuncAnimation(self.fig, self.animate, interval=500, save_count=200, repeat=False)
         tempplot = FigureCanvasTkAgg(self.fig, frame)
         tempplot.draw()
         tempplot.get_tk_widget().grid(row=0, column=0, rowspan=40, columnspan=30, padx=10, pady=10, sticky=tk.NSEW)
@@ -39,7 +39,7 @@ class PlotPanel:
         return frame
 
     def plot_initialize(self):
-        plt.rcParams["figure.figsize"] = [15.00, 4.50]
+        plt.rcParams["figure.figsize"] = [13.00, 4.50]
         plt.rcParams["figure.autolayout"] = True
         plt.rcParams['font.size'] = 14
         fig, ax = plt.subplots()
@@ -53,6 +53,7 @@ class PlotPanel:
         try:
              # Read data from controllers
             tempdata = self.app.temp_controller.read_thermocouples()
+            self.app.temp_controller.current_temp_queue.put(self.app.temp_controller.read_thermocouples()[0])
             pressuredata = self.app.pressure_controller.read_pressure()
             self.app.logger.info(tempdata+ [pressuredata])
 
@@ -70,7 +71,7 @@ class PlotPanel:
             self.ax.set_xlim(left=self.t_array[0], right=self.t_array[0] + 300)
 
             for j, sensor in enumerate(self.sensors[:-1]):
-                y_position = ymin * (ymax / ymin) ** (0.6 + 0.05 * j)
+                y_position = ymin * (ymax / ymin) ** (0.4 + 0.07 * j)
                 self.ax.text(self.t_array[0] + 250, y_position, f"{sensor}, {str(tempdata[j])[:5]}")
             self.fig.tight_layout()
         except Exception as e:
