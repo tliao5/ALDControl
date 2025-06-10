@@ -81,7 +81,7 @@ class TempController:
             if not self.autoset_queue.empty(): # check for updates in queue
                 autoset_temp = self.autoset_queue.get(block=False)
             
-            if self.autoset.is_set() and current_temp > autoset_temp - 0.5:
+            if self.autoset.is_set() and current_temp > autoset_temp + 0.5:
                 duty = set_duty-1
             else:
                 duty = set_duty
