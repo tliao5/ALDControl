@@ -11,6 +11,7 @@ from controllers.temp_controller import TempController
 from controllers.pressure_controller import PressureController
 from controllers.ald_controller import ALDController
 from controllers.mfc_reader import AlicatController
+from controllers.log_controller import LogController
 
 import logging
 logging.basicConfig(filename=LOG_FILE,level=logging.INFO,format="%(asctime)s %(levelname)-8s %(message)s",datefmt="%m/%d/%Y %I:%M:%S %p")
@@ -32,6 +33,7 @@ class ALDApp(tk.Tk):
         self.temp_controller = TempController(self)
         self.pressure_controller = PressureController()
         self.ald_controller = ALDController()
+        self.log_controller = LogController(self)
         self.alicat = alicat = AlicatController(port=MFC_PORT)
         #self.alicat.change_setpoint(setpoint_value=0.0)
 
@@ -84,8 +86,9 @@ class ALDApp(tk.Tk):
 
     def on_closing(self):
         print("GUI closing")
-        self.number_display_panel.close()
+        self.log_controller.close()
         self.plot_panel.close()
+        self.number_display_panel.close()
         self.temp_controller.close()
         self.pressure_controller.close()
         self.ald_controller.close()
