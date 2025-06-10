@@ -11,6 +11,7 @@ FONT = ("Helvetica", 16)
 
 # Log output
 LOG_FILE = "log_test.log"
+SAMPLES_PER_SECOND = 2
 
 
 # Pressure plot default y min and max
