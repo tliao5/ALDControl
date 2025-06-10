@@ -43,9 +43,9 @@ class PlotPanel:
         plt.rcParams["figure.autolayout"] = True
         plt.rcParams['font.size'] = 14
         fig, ax = plt.subplots()
-        pressure = deque([0.1], maxlen=200)
-        t_start = time.time()
-        t_array = deque([0], maxlen=200)
+        t_array = self.app.log_controller.t_array
+        pressure = self.app.log_controller.pressure_deque
+        t_start = self.app.log_controller.t_start
         sensors = ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges", "Pressure"]
         return fig, ax, pressure, t_array, t_start, sensors
 
