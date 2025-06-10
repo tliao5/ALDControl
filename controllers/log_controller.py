@@ -3,7 +3,7 @@ from collections import deque
 import logging
 import time
 import threading
-from config import SAMPLES_PER_SECOND, LOG_FILE
+from config import LOG_FILE
 
 class LogController:
     def __init__(self,app):
@@ -22,6 +22,8 @@ class LogController:
 
     def record_data(self, stopthread, log_queue, t_array,  t_start, pressure_deque,temperature_deque):
         while not stopthread.is_set():
+            measurement_start_time = time.perf_counter()
+            
             tempdata = self.app.temp_controller.read_thermocouples()
             pressuredata = self.app.pressure_controller.read_pressure()
             record = logging.LogRecord(name="", level=20, pathname=LOG_FILE, lineno=0,msg=str(tempdata + [pressuredata]), args=None, exc_info=None)
@@ -31,7 +33,10 @@ class LogController:
             pressure_deque.append(round(pressuredata, 5))
             t_array.append(time.time() - t_start)
             
-            time.sleep(1/SAMPLES_PER_SECOND)
+            measurement_end_time = time.perf_counter()
+            duration = measurement_end_time-measurement_start_time
+            if 0.5-duration > 0:
+                time.sleep(0.5-duration)
 
     def close(self):
         self.stopthread.set()
