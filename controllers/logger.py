@@ -6,7 +6,7 @@ import time
 import threading
 from config import SAMPLES_PER_SECOND, LOG_FILE
 
-class log_controller:
+class LogController:
     def __init__(self,app):
         self.app = app
     
