@@ -64,24 +64,31 @@ class PlotPanel:
             
             # Update line data
             self.line.set_data(self.t_array, self.pressure)
-
-            # Update axes limits
+    
+            # Get current axis limits
             ymin = float(self.ymin.get())
             ymax = float(self.ymax.get())
-            self.ax.set_ylim(ymin, ymax)
-            self.ax.set_yscale('log')
-            self.ax.set_xlim(left=self.t_array[0], right=self.t_array[0] + 300)
-
-            # Update ticks
-            y_ticks = [ymin, (ymin + ymax) / 2, ymax]  # Example: 3 ticks (min, mid, max)
-            self.ax.set_yticks(y_ticks)
-            self.ax.set_yticklabels([f"{tick:.2e}" for tick in y_ticks])  # Format as scientific notation
+            x_min = self.t_array[0]
+            x_max = self.t_array[0] + 300
     
-            x_ticks = [self.t_array[0], self.t_array[0] + 150, self.t_array[0] + 300]  # Example: 3 ticks
-            self.ax.set_xticks(x_ticks)
-            self.ax.set_xticklabels([f"{tick:.0f}" for tick in x_ticks])  # Format as integers
-
-            # Manage text annotations
+            # Check if axis limits have changed
+            if self.ax.get_ylim() != (ymin, ymax):
+                self.ax.set_ylim(ymin, ymax)
+                self.ax.set_yscale('log')  # Ensure log scale is applied
+                y_ticks = [ymin, (ymin + ymax) / 2, ymax]  # Example: 3 ticks (min, mid, max)
+                self.ax.set_yticks(y_ticks)
+                self.ax.set_yticklabels([f"{tick:.2e}" for tick in y_ticks])  # Format as scientific notation
+    
+            if self.ax.get_xlim() != (x_min, x_max):
+                self.ax.set_xlim(left=x_min, right=x_max)
+                x_ticks = [x_min, x_min + 150, x_max]  # Example: 3 ticks
+                self.ax.set_xticks(x_ticks)
+                self.ax.set_xticklabels([f"{tick:.0f}" for tick in x_ticks])  # Format as integers
+    
+            # Update y-axis label dynamically (optional, if label changes)
+            self.ax.set_ylabel("Pressure (log scale)")  # Example label, update as needed
+    
+            # Manage text annotations dynamically
             text_artists = []  # List to store text objects
             tempdata = self.app.log_controller.temperature_deque[-1]
             for j, sensor in enumerate(self.sensors[:-1]):
@@ -90,7 +97,7 @@ class PlotPanel:
                     self.t_array[0] + 250, y_position, f"{sensor}, {str(tempdata[j])[:5]}"
                 )
                 text_artists.append(text)  # Add text object to the list
-
+    
             # Return the updated line object and text objects for blitting
             return [self.line] + text_artists
         except Exception as e:
