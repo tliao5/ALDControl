@@ -45,15 +45,16 @@ class NumberDisplayPanel:
         tk.Entry(mfc,width=5,font=FONT,textvariable=setpt).pack(side=tk.LEFT,anchor=tk.NW,padx=5,pady=5)
         self.setpoint_button = tk.Button(mfc,text="Change Setpoint",font=FONT,bg=OFF_COLOR,fg=BUTTON_TEXT_COLOR,relief=BUTTON_STYLE,command=lambda:self.change_setpt(setpt))
         self.setpoint_button.pack(side=tk.LEFT,padx=5)
+        '''
         self.flowrate_label = tk.Label(frame,text="Flowrate: ", bg=BG_COLOR, font=FONT)
         self.flowrate_label.pack(side=tk.TOP,anchor=tk.NW,padx=20,pady=5)
         self.update_setpoint_reading()
-            
+        '''    
         tk.Label(frame, text=f"Heater 4 - TMA, gauges", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
         tk.Label(frame, text=f"Heater 3 - Inlet", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
         tk.Label(frame, text=f"Heater 2 - Trap", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
         tk.Label(frame, text=f"Heater 1 - Chamber", bg=BG_COLOR, font=FONT).pack(side=tk.BOTTOM, anchor=tk.SW, pady=5,padx=10)
- 
+        
         return frame
 
     def set_duty_value(self, i, duty_cycle_var):
@@ -76,13 +77,13 @@ class NumberDisplayPanel:
             self.app.alicat.change_setpoint(setpoint_value=setpt)
         except:
             print("Invalid Setpoint")
-            
+    '''        
     def update_setpoint_reading(self):
         if self.app.winfo_exists():
             flowrate = str.split(self.app.alicat.poll_device_data())[4]
             self.flowrate_label.config(text=f"Flowrate: {flowrate}")
-            self.flowrate_label.after(1000, self.update_setpoint_reading)
-        
+            self.after_id = self.flowrate_label.after(10000, self.update_setpoint_reading)
+    '''    
     def change_autoset(self, autoset_temp_var):
         #try:
         self.autoset_temp = int(autoset_temp_var.get())
@@ -96,8 +97,12 @@ class NumberDisplayPanel:
             print("Autoset Enabled")
             self.autoset_button.config(bg=ON_COLOR)
             self.heater_buttons[0].config(state=tk.DISABLED)
-            self.app.temp_controller.autoset_queue.put(self.autoset_temp)
             self.app.temp_controller.autoset.set()
+            self.app.temp_controller.autoset_queue.put(self.autoset_temp)
+    
+    def close(self):
+        pass
+        #self.flowrate_label.after_cancel(self.after_id)
 
         #    else:            
         #        raise Exception()

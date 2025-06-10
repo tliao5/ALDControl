@@ -20,7 +20,7 @@ class PlotPanel:
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        ani = animation.FuncAnimation(self.fig, self.animate, interval=500, save_count=200, repeat=False)
+        ani = animation.FuncAnimation(self.fig, self.animate, interval=250, save_count=150, repeat=True)
         tempplot = FigureCanvasTkAgg(self.fig, frame)
         tempplot.draw()
         tempplot.get_tk_widget().grid(row=0, column=0, rowspan=40, columnspan=30, padx=10, pady=10, sticky=tk.NSEW)
