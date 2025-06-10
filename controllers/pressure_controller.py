@@ -4,24 +4,17 @@ import queue
 import logging
 import time
 import threading
+from config import PRESSURE_CHANNEL
 
 class PressureController:
     def __init__(self):
-        pressure_sensor_channel={"Pchannel":"cDAQ1Mod2/ai2"}
+        print("Pressure Controller Initializing")
+        pressure_sensor_channel = PRESSURE_CHANNEL
         self.ptask = nidaqmx.Task("Pressure")
         self.ptask.ai_channels.add_ai_voltage_chan(pressure_sensor_channel["Pchannel"], min_val=-10.0, max_val=10.0)
         self.ptask.start()
-        # Add flow controller functionality?
-
         #log pressure controller initialized
-
-    #def set_flow_rate():
-    
-    #def read_cfm():
-
-    #def log_pressure():
-
-    #def log_cfm():
+        print("Pressure Controller Initialized")
 
     def read_pressure(self):
         voltage = self.ptask.read()
