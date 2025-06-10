@@ -10,7 +10,7 @@ FONT = ("Helvetica", 16)
 
 
 # Log output
-LOG_FILE = "PressureTempJune.log"
+LOG_FILE = "log_test.log"
 
 
 # Pressure plot default y min and max
@@ -28,5 +28,6 @@ HEATER_CHANNELS = { "h1channel": "CDAQ1Mod4/port0/line5", # heater 1
                     "h3channel": "CDAQ1Mod4/port0/line7", # heater 3
                     "h4channel": "CDAQ1Mod4/port0/line8"} # heater 4
 TEMP_CHANNELS = ["ai0", "ai1", "ai2", "ai3", "ai4", "ai5", "ai6"]
+PRESSURE_CHANNEL = {"Pchannel":"cDAQ1Mod2/ai2"}
 
 MFC_PORT = "COM6"

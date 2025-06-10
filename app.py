@@ -44,7 +44,7 @@ class ALDApp(tk.Tk):
 
         # Layout
         self.create_layout()
-        
+        print("ALD Control GUI Initialized")
         self.logger.info("ALD Control Initialized")
 
     def create_layout(self):
@@ -84,6 +84,7 @@ class ALDApp(tk.Tk):
 
     def on_closing(self):
         print("GUI closing")
+        self.number_display_panel.close()
         self.plot_panel.close()
         self.temp_controller.close()
         self.pressure_controller.close()
