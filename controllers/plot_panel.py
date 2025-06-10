@@ -8,6 +8,16 @@ import time
 import logging
 from config import *
 
+import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.figure import Figure
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+from collections import deque
+import time
+import logging
+from config import *
+
 class PlotPanel:
     def __init__(self, app):
         self.app = app
