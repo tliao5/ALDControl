@@ -72,6 +72,15 @@ class PlotPanel:
             self.ax.set_yscale('log')
             self.ax.set_xlim(left=self.t_array[0], right=self.t_array[0] + 300)
 
+            # Update ticks
+            y_ticks = [ymin, (ymin + ymax) / 2, ymax]  # Example: 3 ticks (min, mid, max)
+            self.ax.set_yticks(y_ticks)
+            self.ax.set_yticklabels([f"{tick:.2e}" for tick in y_ticks])  # Format as scientific notation
+    
+            x_ticks = [self.t_array[0], self.t_array[0] + 150, self.t_array[0] + 300]  # Example: 3 ticks
+            self.ax.set_xticks(x_ticks)
+            self.ax.set_xticklabels([f"{tick:.0f}" for tick in x_ticks])  # Format as integers
+
             # Manage text annotations
             text_artists = []  # List to store text objects
             tempdata = self.app.log_controller.temperature_deque[-1]
