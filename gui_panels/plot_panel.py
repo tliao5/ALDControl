@@ -51,14 +51,10 @@ class PlotPanel:
 
     def animate(self, i):
         try:
-             # Read data from controllers
-            tempdata = self.app.temp_controller.read_thermocouples()
-            self.app.temp_controller.current_temp_queue.put(self.app.temp_controller.read_thermocouples()[0])
-            pressuredata = self.app.pressure_controller.read_pressure()
-            self.app.logger.info(tempdata+ [pressuredata])
-
-            self.pressure.append(round(pressuredata, 5))
-            self.t_array.append(time.time() - self.t_start)
+            while not self.app.log_controller.log_queue.empty(): # check for updates in queue
+                self.app.logger.handle(self.app.log_controller.log_queue.get(block=False))
+            tempdata=self.app.log_controller.temperature_deque[-1]
+        
 
             self.ax.clear()
             self.ax.plot(self.t_array, self.pressure)
