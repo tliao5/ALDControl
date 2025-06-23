@@ -29,12 +29,14 @@ class ALDApp(tk.Tk):
 
         # logger for general application logs
         self.logger = logging.getLogger('main_logger')
+        self.logger.propagate=False
         self.logger.setLevel(logging.INFO)
         logger_handler = logging.FileHandler(LOG_FILE)
         logger_handler.setFormatter(formatter)
         self.logger.addHandler(logger_handler)
 
         self.monitor_logger = logging.getLogger('monitor')
+        self.monitor_logger.propagate=False
         self.monitor_logger.setLevel(logging.DEBUG)
         monitor_handler = logging.FileHandler(MONITOR_LOG_FILE)
         monitor_handler.setFormatter(monitor_formatter)
