@@ -9,7 +9,7 @@ class LogController:
     def __init__(self,app):
         self.app = app
     
-        self.max_temperatures = [1000]*4
+        self.max_temperatures = [100]*4
         self.controllers_active_flag = True
 
         self.t_array = deque([0], maxlen=200)
@@ -44,9 +44,9 @@ class LogController:
                 if tempdata[5] > self.max_temperatures[1]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}")
                     self.kill_run()
-                '''if max(tempdata[1],tempdata[2],tempdata[4] > self.max_temperatures[2]):
+                if max(tempdata[1],tempdata[2],tempdata[4]) > self.max_temperatures[2]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}")
-                    self.kill_run()'''
+                    self.kill_run()
                 if max(tempdata[3],tempdata[6]) > self.max_temperatures[3]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}")
                     self.kill_run()
@@ -64,10 +64,9 @@ class LogController:
         self.max_temperatures[i] = max_temp
 
     def kill_run(self):
-        self.app.temp_controller.stopthread.set()
-        self.app.ald_controller.close()
-        self.app.valve_controller.close()
-        self.controllers_active_flag = False
+        self.app.main_power.main_power_off()
+        if hasattr(self.app.ald_controller, 'aldRunThread') and self.app.ald_controller.aldRunThread is not None:
+            self.app.ald_panel.pause_run()
 
     def close(self):
         self.stopthread.set()
