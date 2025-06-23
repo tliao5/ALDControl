@@ -41,7 +41,7 @@ class ALDController:
             if self.app.ald_panel.pause_run_event.is_set():
                 vc.close_all()
                 while self.app.ald_panel.pause_run_event.is_set() and not self.stopthread.is_set():
-                    pass
+                    time.sleep(1)
             if self.stopthread.is_set():
                     break
 
