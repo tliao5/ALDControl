@@ -9,9 +9,10 @@ class NumberDisplayPanel:
         frame = tk.Frame(bg=BG_COLOR, highlightbackground=BORDER_COLOR, highlightthickness=1)
         
         self.duty = [tk.StringVar() for i in range(len(HEATER_CHANNELS))]
+        self.max_temp = [tk.StringVar() for i in range(len(HEATER_CHANNELS))]
         
         self.heater_buttons = [tk.Button() for i in range(len(HEATER_CHANNELS))]
-        
+        self.max_temp_buttons = [tk.Button() for i in range(len(HEATER_CHANNELS))]
         # Create heater buttons
         self.heater_buttons = [tk.Button() for i in range(len(HEATER_CHANNELS))]
         for i in range(len(HEATER_CHANNELS)):
@@ -19,25 +20,37 @@ class NumberDisplayPanel:
             row = tk.Frame(frame, bg=BG_COLOR, pady=10)
             row.pack(fill=tk.X, padx=10, pady=5)
             tk.Label(row, text=f"Heater {i+1}:", bg=BG_COLOR, font=FONT).pack(side=tk.LEFT, padx=5)
-            tk.Entry(row, width=10, font=FONT, textvariable=self.duty[i]).pack(side=tk.LEFT, padx=5)
+            tk.Entry(row, width=4, font=FONT, textvariable=self.duty[i]).pack(side=tk.LEFT, padx=5)
 
             button = tk.Button(
-                row, text="Set", font=FONT, bg=OFF_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
+                row, text="Set", font=FONT, bg=OFF_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE, width=4,
                 command=lambda i=i: self.set_duty_value(i, self.duty[i])
             )
             button.pack(side=tk.LEFT, padx=5)
             self.heater_buttons[i] = button
 
+            tk.Entry(row, width=4, font=FONT, textvariable=self.max_temp[i]).pack(side=tk.LEFT, padx=5)
+
+            max_temp_button = tk.Button(
+                row, text="Set", font=FONT, bg=OFF_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
+                command=lambda i=i: self.set_max_temp(i, self.max_temp[i])
+            )
+            
+            max_temp_button.pack(side=tk.LEFT, padx=5)
+            self.max_temp_buttons[i] = max_temp_button
+            
+
             # Create autoset buttons
             if i == 0:
                 self.autoset_frame = tk.Frame(row,bg=BG_COLOR,pady=10)
-                self.autoset_frame.pack(fill=tk.X,padx=5,pady=5)
+                self.autoset_frame.pack(side=tk.RIGHT,padx=5,pady=5)
                 autoset_temp=tk.StringVar()
                 tk.Entry(self.autoset_frame,width=3,font=FONT,textvariable=autoset_temp).pack(side=tk.LEFT,anchor=tk.NW,padx=(5,2),pady=5)
                 tk.Label(self.autoset_frame, text ="°C", bg=BG_COLOR, font=FONT).pack(side=tk.LEFT,anchor=tk.NW,pady=5)
                 self.autoset_button = tk.Button(self.autoset_frame,text="Autoset",font=FONT,bg=OFF_COLOR,fg=BUTTON_TEXT_COLOR,relief=BUTTON_STYLE,command=lambda:self.change_autoset(autoset_temp))
                 self.autoset_button.pack(side=tk.LEFT,padx=5)
         
+        '''
         mfc = tk.Frame(frame,bg=BG_COLOR,pady=10)
         mfc.pack(anchor=tk.N,fill=tk.X,padx=10,pady=5)
         setpt=tk.StringVar()
@@ -45,6 +58,7 @@ class NumberDisplayPanel:
         tk.Entry(mfc,width=5,font=FONT,textvariable=setpt).pack(side=tk.LEFT,anchor=tk.NW,padx=5,pady=5)
         self.setpoint_button = tk.Button(mfc,text="Change Setpoint",font=FONT,bg=OFF_COLOR,fg=BUTTON_TEXT_COLOR,relief=BUTTON_STYLE,command=lambda:self.change_setpt(setpt))
         self.setpoint_button.pack(side=tk.LEFT,padx=5)
+        '''
         '''
         self.flowrate_label = tk.Label(frame,text="Flowrate: ", bg=BG_COLOR, font=FONT)
         self.flowrate_label.pack(side=tk.TOP,anchor=tk.NW,padx=20,pady=5)
@@ -64,6 +78,14 @@ class NumberDisplayPanel:
         else:
             self.heater_buttons[i].config(bg=ON_COLOR)
             
+    def set_max_temp(self, i, max_temp_var):
+        max_temp = float(max_temp_var.get())
+        self.app.log_controller.update_max_temp(i,max_temp)
+        if max_temp > 0:
+            self.max_temp_buttons[i].config(bg=ON_COLOR)
+        else:
+            self.max_temp_buttons[i].config(bg=OFF_COLOR)
+            
     def change_setpt(self,setpt_var):
         try:
             setpt = float(setpt_var.get())
@@ -77,13 +99,7 @@ class NumberDisplayPanel:
             self.app.alicat.change_setpoint(setpoint_value=setpt)
         except:
             print("Invalid Setpoint")
-    '''        
-    def update_setpoint_reading(self):
-        if self.app.winfo_exists():
-            flowrate = str.split(self.app.alicat.poll_device_data())[4]
-            self.flowrate_label.config(text=f"Flowrate: {flowrate}")
-            self.after_id = self.flowrate_label.after(10000, self.update_setpoint_reading)
-    '''    
+    
     def change_autoset(self, autoset_temp_var):
         #try:
         self.autoset_temp = int(autoset_temp_var.get())
@@ -102,30 +118,3 @@ class NumberDisplayPanel:
     
     def close(self):
         pass
-        #self.flowrate_label.after_cancel(self.after_id)
-
-        #    else:            
-        #        raise Exception()
-        #except:
-        #    print("Invalid Autoset")
-
-'''    def update_autoset(self):
-        if self.app.winfo_exists():
-            if self.autoset == True: 
-                autoset_temp = self.autoset_temp
-                print("Update")
-                current_temp = self.app.temp_controller.read_thermocouples()[0]
-                d = tk.StringVar()
-                if autoset_temp <= current_temp:
-                    print(f"{current_temp} temp too high, target: {autoset_temp}")
-                    d.set(int(self.duty[0].get())-1)
-                elif autoset_temp > current_temp:
-                    print(f"{current_temp} temp too low, target: {autoset_temp}")
-                    d.set(self.duty[0].get())
-
-                if d.get() != self.duty[0].get():
-                    self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[0],d)
-                print(d.get())
-            else:
-                self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[0],self.duty[0])
-            self.autoset_frame.after(5000,self.update_autoset)'''
