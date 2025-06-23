@@ -108,7 +108,7 @@ class ALDPanel:
                 widget.config(state=tk.DISABLED)
         print("test")
 
-        self.pause_button = tk.Button(self.ald_panel, text="Pause Run", font=FONT, bg=ON_COLOR, relief=BUTTON_STYLE,
+        self.pause_button = tk.Button(self.recipe_label.master, text="Pause Run", font=FONT, bg=ON_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
                     command=lambda: self.toggle_pause_run())
         self.pause_button.pack(side=tk.LEFT,padx=5)
 
@@ -135,11 +135,15 @@ class ALDPanel:
         print("paused")
         self.pause_run_event.set()
         self.pause_button["bg"] = OFF_COLOR
+        self.pause_button["text"] = "Unpause Run"
+        self.recipe_label["text"]="Status: Run Paused"
     
     def unpause_run(self):
         print("unpaused")
         self.pause_run_event.clear()
         self.pause_button["bg"] = ON_COLOR
+        self.pause_button["text"] = "Pause Run"
+        self.recipe_label.config(text="Status: Run in Progress")
 
     def update_progress_bar(self):
         if self.pause_run_event.is_set():
