@@ -14,9 +14,6 @@ from controllers.mfc_reader import AlicatController
 from controllers.log_controller import LogController
 
 import logging
-logging.basicConfig(filename=LOG_FILE,level=logging.INFO,format="%(asctime)s %(levelname)-8s %(message)s",datefmt="%m/%d/%Y %I:%M:%S %p")
-
-
 class ALDApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -26,16 +23,34 @@ class ALDApp(tk.Tk):
         self.configure(bg=BG_COLOR)
         
         # Logging output setup
-        self.logger = logging.getLogger(__name__)
+        # create formatters ormatters
+        formatter = logging.Formatter(fmt='%(asctime)s %(message)s',datefmt='%m/%d %H:%M:%S')
+        monitor_formatter = logging.Formatter( fmt='%(asctime)s.%(msecs)03d %(message)s',datefmt='%m/%d %H:%M:%S')
+
+        # logger for general application logs
+        self.logger = logging.getLogger('main_logger')
+        self.logger.setLevel(logging.INFO)
+        logger_handler = logging.FileHandler(LOG_FILE)
+        logger_handler.setFormatter(formatter)
+        self.logger.addHandler(logger_handler)
+
+        self.monitor_logger = logging.getLogger('monitor')
+        self.monitor_logger.setLevel(logging.DEBUG)
+        monitor_handler = logging.FileHandler(MONITOR_LOG_FILE)
+        monitor_handler.setFormatter(monitor_formatter)
+        self.monitor_logger.addHandler(monitor_handler)
 
         # Initialize controllers
         self.valve_controller = ValveController()
         self.temp_controller = TempController(self)
         self.pressure_controller = PressureController()
-        self.ald_controller = ALDController()
+        self.ald_controller = ALDController(self)
         self.log_controller = LogController(self)
+
+        self.temp_controller.start_threads()
+
         self.alicat = alicat = AlicatController(port=MFC_PORT)
-        #self.alicat.change_setpoint(setpoint_value=0.0)
+        self.alicat.change_setpoint(setpoint_value=0.0)
 
         # Initialize components
         self.main_power = MainPower(self)
@@ -44,32 +59,31 @@ class ALDApp(tk.Tk):
         self.ald_panel = ALDPanel(self)
         self.manual_control_panel = ManualControlPanel(self)
 
-        # Layout
         self.create_layout()
         print("ALD Control GUI Initialized")
         self.logger.info("ALD Control Initialized")
 
     def create_layout(self):
-        # Outer frame
+        # outer frame contains all other frames
         outer_frame = tk.Frame(self, bg=BG_COLOR, highlightbackground=TEXT_COLOR, highlightthickness=5)
         outer_frame.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
 
-        # Top pane
+        # top pane - main power switch
         top_pane = tk.PanedWindow(outer_frame, orient=tk.VERTICAL, bg=BG_COLOR, bd=0, sashwidth=2, sashpad=0)
         top_pane.pack(fill=tk.BOTH, expand=True)
 
-        # Main Power Button
+        # main power button
         top_frame = tk.Frame(top_pane, bg=BG_COLOR, height=50, highlightbackground=BORDER_COLOR, highlightthickness=1)
         self.main_power.create_main_power_button(top_frame)
         top_pane.add(top_frame)
 
-        # Main content area
+        # main content area - will contain plot_panel and number_display_panel
         main_pane = tk.PanedWindow(top_pane, orient=tk.VERTICAL, bg=BG_COLOR, bd=0, sashwidth=5)
         main_pane.grid_rowconfigure(0, weight=1)
         main_pane.grid_columnconfigure(0, weight=1)
         top_pane.add(main_pane)
 
-        # Horizontal PanedWindow
+        # sets up the two areas for plot_panel and number_display_panel
         horizontal_pane = tk.PanedWindow(main_pane, orient=tk.HORIZONTAL, bg=BG_COLOR, bd=0, sashwidth=5)
         main_pane.add(horizontal_pane)
         horizontal_pane.add(self.plot_panel.create_plot_panel("Left Panel Plot"))
@@ -78,7 +92,7 @@ class ALDApp(tk.Tk):
         horizontal_pane.grid_columnconfigure(0, weight=1)
         horizontal_pane.grid_columnconfigure(1, weight=1)
 
-        # Bottom pane
+        # bottom content area - will contain manual_control_panel and ald_panel
         bottom_pane = tk.PanedWindow(main_pane, orient=tk.HORIZONTAL, bg=BG_COLOR, bd=0, sashwidth=5, height=300)
         main_pane.add(bottom_pane)
         self.manual_control_panel.create_manual_controls(bottom_pane)
