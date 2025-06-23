@@ -21,7 +21,6 @@ class ValveController:
         for i in range(len(VALVE_CHANNELS)):
             valves[i].do_channels.add_do_chan(self.valvechannels[f"AV0{i+1}"], line_grouping=LineGrouping.CHAN_PER_LINE)
             valves[i].start()
-            print(valves)
         return valves
 
         
@@ -44,15 +43,12 @@ class ValveController:
             #print(t.name)
             t.write(True)
             measurement_start_time = time.perf_counter()
-            
-            
         time.sleep(pulse_length)
         for t in tasks[::]:
             #print(t.name)
-            
             t.write(False)
             measurement_end_time = time.perf_counter()
-            print(measurement_end_time-measurement_start_time)
+            #print(measurement_end_time-measurement_start_time)
         
         
         #print(f"Task {task.name}: False")
