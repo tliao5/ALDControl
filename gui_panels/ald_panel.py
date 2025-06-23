@@ -1,12 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from config import *
+import threading
 import pandas as pd
 
 class ALDPanel:
     def __init__(self, app):
         self.app = app
-        self.queue = app.ald_controller.queue
+
         self.runtime = 0
         self.loops=tk.StringVar()
         self.progressbar = None
@@ -14,6 +15,7 @@ class ALDPanel:
         self.recipe_entry = tk.StringVar()  # Entry field for recipe loops
         self.recipe_label = None  # Label field for run state
         self.confirm_button = None  # Confirm button for run state
+        self.pause_run_event = threading.Event()
 
     def create_ald_panel(self, parent):
         self.ald_panel = tk.Frame(parent, bg=BG_COLOR, highlightbackground=BORDER_COLOR, highlightthickness=1)
@@ -104,6 +106,11 @@ class ALDPanel:
         for widget in self.app.manual_control_panel.panel.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.config(state=tk.DISABLED)
+        print("test")
+
+        self.pause_button = tk.Button(self.ald_panel, text="Pause Run", font=FONT, bg=ON_COLOR, relief=BUTTON_STYLE,
+                    command=lambda: self.pause_run())
+        self.pause_button.pack(side=tk.LEFT,padx=5)
 
         # Update the label to indicate the run is in progress
         self.recipe_label.config(text="Status: Run in Progress")
@@ -117,14 +124,27 @@ class ALDPanel:
         
         # Log run start
         self.app.logger.info("Starting New Run")
+    
+    def pause_run(self):
+        pause_button = self.pause_button
+        if pause_button["bg"] == ON_COLOR:
+            print("paused")
+            self.pause_run_event.set()
+            pause_button["bg"] = OFF_COLOR
+        elif pause_button["bg"] == OFF_COLOR:
+            print("unpaused")
+            self.pause_run_event.clear()
+            pause_button["bg"] == ON_COLOR
 
     def update_progress_bar(self):
-        if not self.queue.empty(): # check for updates in queue
-            elapsed_time = int(self.queue.get(block=False))
+        if self.pause_run_event.is_set():
+            self.progressbar.after(900, self.update_progress_bar)
+        elif not self.app.ald_controller.queue.empty(): # check for updates in queue
+            elapsed_time = int(self.app.ald_controller.queue.get(block=False))
             #print(f"Elapsed Time: {elapsed_time}")
             self.progressbar["value"] = elapsed_time
             self.progressbar.after(900, self.update_progress_bar)
-            self.progresstime["text"] = f"Estimated Time Left: {self.format_time(int(self.runtime - self.progressbar["value"]))}"
+            self.progresstime["text"] = f"Estimated Time Left: {self.format_time(int(self.runtime - elapsed_time))}"
         elif self.progressbar["value"] + 1 <= self.runtime:
             self.progressbar.step(1)
             self.progresstime["text"] = f"Estimated Time Left: {self.format_time(int(self.runtime - self.progressbar["value"]))}"
@@ -132,6 +152,8 @@ class ALDPanel:
         else:
             self.progressbar["value"] = self.runtime
             self.progresstime["text"] = f"Estimated Time Left: {self.format_time(0)}"
+
+            self.pause_button.pack_forget()
 
             # Re-enable manual control buttons
             self.enable_manual_controls()
