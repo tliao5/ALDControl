@@ -94,17 +94,17 @@ class TempController:
             
             # Duty Cycle
             if duty > 0:
-                time.sleep(duty/tps)
-                measurement_end_time = time.perf_counter()
-                duration = measurement_end_time-measurement_start_time
-                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
-                log_queue.put(record)
-                task.write(True) # send update signal to DAQ
-                measurement_start_time = time.perf_counter()
                 time.sleep((tps-duty)/tps)
                 measurement_end_time = time.perf_counter()
                 duration = measurement_end_time-measurement_start_time
                 record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 0, {duty}, {round(duration,3)}", args=None, exc_info=None)
+                log_queue.put(record)
+                task.write(True) # send update signal to DAQ
+                measurement_start_time = time.perf_counter()
+                time.sleep(duty/tps)
+                measurement_end_time = time.perf_counter()
+                duration = measurement_end_time-measurement_start_time
+                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
                 log_queue.put(record)
                 task.write(False) # send update signal to DAQ
             else:
@@ -134,17 +134,17 @@ class TempController:
 
             # Duty Cycle
             if duty > 0:
-                time.sleep(duty/tps)
-                measurement_end_time = time.perf_counter()
-                duration = measurement_end_time-measurement_start_time
-                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
-                log_queue.put(record)
-                task.write(True) # send update signal to DAQ
-                measurement_start_time = time.perf_counter()
                 time.sleep((tps-duty)/tps)
                 measurement_end_time = time.perf_counter()
                 duration = measurement_end_time-measurement_start_time
                 record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 0, {duty}, {round(duration,3)}", args=None, exc_info=None)
+                log_queue.put(record)
+                task.write(True) # send update signal to DAQ
+                measurement_start_time = time.perf_counter()
+                time.sleep(duty/tps)
+                measurement_end_time = time.perf_counter()
+                duration = measurement_end_time-measurement_start_time
+                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
                 log_queue.put(record)
                 task.write(False) # send update signal to DAQ
             else:
