@@ -56,8 +56,8 @@ class ValveController:
 
     def close_all(self):
         for task in self.tasks[::]:
-            print(task)
-            #task.write(False)
+            #print(task)
+            task.write(False)
             time.sleep(0.1)
 
     def close(self):
