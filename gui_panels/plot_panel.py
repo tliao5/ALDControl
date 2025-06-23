@@ -51,9 +51,6 @@ class PlotPanel:
 
     def animate(self, i):
         try:
-            # log data from controllers
-            while not self.app.log_controller.log_queue.empty(): # check for updates in queue
-                self.app.logger.handle(self.app.log_controller.log_queue.get(block=False))
             tempdata = self.app.log_controller.temperature_deque[-1]
 
             self.ax.clear()
