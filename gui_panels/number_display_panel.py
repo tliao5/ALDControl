@@ -29,10 +29,11 @@ class NumberDisplayPanel:
             button.pack(side=tk.LEFT, padx=5)
             self.heater_buttons[i] = button
 
-            tk.Entry(row, width=4, font=FONT, textvariable=self.max_temp[i]).pack(side=tk.LEFT, padx=5)
-
+            tk.Entry(row, width=4, font=FONT, textvariable=self.max_temp[i]).pack(side=tk.LEFT, padx=(20,5))
+            tk.Label(row, text ="°C", bg=BG_COLOR, font=FONT).pack(side=tk.LEFT,anchor=tk.W,pady=5)
+                
             max_temp_button = tk.Button(
-                row, text="Set", font=FONT, bg=OFF_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
+                row, text="Max", font=FONT, bg=OFF_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
                 command=lambda i=i: self.set_max_temp(i, self.max_temp[i])
             )
             
