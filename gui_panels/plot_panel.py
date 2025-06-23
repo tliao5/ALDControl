@@ -43,22 +43,15 @@ class PlotPanel:
         plt.rcParams["figure.autolayout"] = True
         plt.rcParams['font.size'] = 14
         fig, ax = plt.subplots()
-        pressure = deque([0.1], maxlen=200)
-        t_start = time.time()
-        t_array = deque([0], maxlen=200)
+        pressure = self.app.log_controller.pressure_deque
+        t_start = self.app.log_controller.t_start
+        t_array = self.app.log_controller.t_array
         sensors = ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges", "Pressure"]
         return fig, ax, pressure, t_array, t_start, sensors
 
     def animate(self, i):
         try:
-             # Read data from controllers
-            tempdata = self.app.temp_controller.read_thermocouples()
-            self.app.temp_controller.current_temp_queue.put(self.app.temp_controller.read_thermocouples()[0])
-            pressuredata = self.app.pressure_controller.read_pressure()
-            self.app.logger.info(tempdata+ [pressuredata])
-
-            self.pressure.append(round(pressuredata, 5))
-            self.t_array.append(time.time() - self.t_start)
+            tempdata = self.app.log_controller.temperature_deque[-1]
 
             self.ax.clear()
             self.ax.plot(self.t_array, self.pressure)

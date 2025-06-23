@@ -11,7 +11,7 @@ FONT = ("Helvetica", 16)
 
 # Log output
 LOG_FILE = "log_test.log"
-
+MONITOR_LOG_FILE = "monitor.log"
 
 # Pressure plot default y min and max
 Y_MIN_DEFAULT = 0.450
