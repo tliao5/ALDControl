@@ -109,7 +109,7 @@ class ALDPanel:
         print("test")
 
         self.pause_button = tk.Button(self.ald_panel, text="Pause Run", font=FONT, bg=ON_COLOR, relief=BUTTON_STYLE,
-                    command=lambda: self.pause_run())
+                    command=lambda: self.toggle_pause_run())
         self.pause_button.pack(side=tk.LEFT,padx=5)
 
         # Update the label to indicate the run is in progress
@@ -125,16 +125,21 @@ class ALDPanel:
         # Log run start
         self.app.logger.info("Starting New Run")
     
+    def toggle_pause_run(self):
+        if self.pause_button["bg"] == ON_COLOR:
+            self.pause_run()
+        elif self.pause_button["bg"] == OFF_COLOR:
+            self.unpause_run()
+    
     def pause_run(self):
-        pause_button = self.pause_button
-        if pause_button["bg"] == ON_COLOR:
-            print("paused")
-            self.pause_run_event.set()
-            pause_button["bg"] = OFF_COLOR
-        elif pause_button["bg"] == OFF_COLOR:
-            print("unpaused")
-            self.pause_run_event.clear()
-            pause_button["bg"] == ON_COLOR
+        print("paused")
+        self.pause_run_event.set()
+        self.pause_button["bg"] = OFF_COLOR
+    
+    def unpause_run(self):
+        print("unpaused")
+        self.pause_run_event.clear()
+        self.pause_button["bg"] = ON_COLOR
 
     def update_progress_bar(self):
         if self.pause_run_event.is_set():
