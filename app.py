@@ -52,7 +52,7 @@ class ALDApp(tk.Tk):
         self.temp_controller.start_threads()
 
         self.alicat = alicat = AlicatController(port=MFC_PORT)
-        self.alicat.change_setpoint(setpoint_value=0.0)
+        #self.alicat.change_setpoint(setpoint_value=0.0)
 
         # Initialize components
         self.main_power = MainPower(self)
