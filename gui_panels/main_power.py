@@ -45,6 +45,8 @@ class MainPower:
         self.main_power_button.config(text='Main Power ON', bg=ON_COLOR)
         record = log_controller.create_record(f"MP, 1",MONITOR_LOG_FILE)
         self.app.log_controller.monitor_queue.put(record)
+        
+        self.app.log_controller.controllers_active_flag = True
 
     def close(self):
         self.task.write(False)
