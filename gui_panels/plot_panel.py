@@ -51,6 +51,7 @@ class PlotPanel:
         plt.rcParams["figure.autolayout"] = True
         plt.rcParams['font.size'] = 14
         fig, ax = plt.subplots()
+        ax.locator_params(tight=True,nbins=300)
         ax_right = ax.twinx()
         pressure = self.app.log_controller.pressure_deque
         t_start = self.app.log_controller.t_start
@@ -66,9 +67,8 @@ class PlotPanel:
             tempdata = self.app.log_controller.temperature_deque[-1]
             
 
-            self.ax.plot(self.t_array, self.pressure)
+            self.ax.plot(self.t_array, self.pressure,linewidth=1.5)
             
-            # Plot the data using Matplotlib
             if self.show_temperatures == True:
                 self.ax_right.set_visible(True) 
                 for i in range(6):
