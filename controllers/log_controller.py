@@ -12,9 +12,9 @@ class LogController:
         self.max_temperatures = [100]*4
         self.controllers_active_flag = True
 
-        self.t_array = deque([0], maxlen=200)
-        self.pressure_deque = deque([0],maxlen=200)
-        self.temperature_deque = deque([0],maxlen=200)
+        self.t_array = deque([], maxlen=200)
+        self.pressure_deque = deque([],maxlen=200)
+        self.temperature_deque = deque([],maxlen=200)
         self.stopthread = threading.Event()
         self.t_start = time.time()
         
