@@ -252,6 +252,8 @@ The control application consists of the following components:
 - **`matplotlib`** – Used for real-time plotting of pressure and temperature data.  
 - **`nidaqmx`** – Used for interfacing with NI DAQ hardware for sensor and actuator control.  
 - **`serial`** – Used for communicating with the Alicat Mass Flow Controller.  
-- **`logging`** – Used for logging events and data for monitoring and debugging.  
+- **`logging`** – Used for logging events and data for monitoring and debugging.
+- **`queue`** - Used for managing thread communication
+- **`collections.deque`** - Used to store temperature and pressure data in a threadsafe manner
 
 ---
