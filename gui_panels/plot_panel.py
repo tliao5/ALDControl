@@ -56,7 +56,7 @@ class PlotPanel:
         pressure = self.app.log_controller.pressure_deque
         t_start = self.app.log_controller.t_start
         t_array = self.app.log_controller.t_array
-        sensors = ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges","1","4","5","7","9","Pressure"]
+        sensors = SENSOR_NAMES
         return fig, ax, ax_right, pressure, t_array, t_start, sensors
 
     def animate(self, i):
