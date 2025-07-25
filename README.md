@@ -44,7 +44,7 @@ The control application consists of the following components:
 ```
 # Notes
 Logging/Plotting:
-    
+
     - Logging occurs every 0.5s when the log_controller gathers data and log records from various parts of the program
     - The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
 
