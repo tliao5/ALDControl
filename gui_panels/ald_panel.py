@@ -106,7 +106,6 @@ class ALDPanel:
         for widget in self.app.manual_control_panel.panel.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.config(state=tk.DISABLED)
-        print("test")
 
         self.pause_button = tk.Button(self.recipe_label.master, text="Pause Run", font=FONT, bg=ON_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
                     command=lambda: self.toggle_pause_run())

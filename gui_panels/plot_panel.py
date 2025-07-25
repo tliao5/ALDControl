@@ -8,7 +8,7 @@ import time
 import logging
 from config import *
 
-THERMOCOUPLE_COLORS = ["b","g","r","c","m","y","k"]
+THERMOCOUPLE_COLORS = ["b","g","r","c","m","y","k","steelblue","fuchsia","navy","peru","lawngreen"]
 
 class PlotPanel:
     def __init__(self, app):
@@ -31,32 +31,32 @@ class PlotPanel:
 
         toolbar_frame = tk.Frame(master=frame)
         toolbar_frame.grid(row=41, column=0, columnspan=30, pady=5)
-        NavigationToolbar2Tk(tempplot, toolbar_frame)
+        #NavigationToolbar2Tk(tempplot, toolbar_frame)
 
-        row = tk.Frame(frame, bg=TEXT_COLOR, pady=10)
+        row = tk.Frame(frame, bg=TEXT_COLOR)
         row.grid(row=frame.grid_size()[1], column=0, columnspan=frame.grid_size()[0], pady=10)
         tk.Label(row, text="y-min:", relief=BUTTON_STYLE, bg=BG_COLOR, font=FONT).pack(side=tk.LEFT, padx=5)
         tk.Entry(row, width=10, textvariable=self.ymin, font=FONT).pack(side=tk.LEFT, padx=5)
         tk.Label(row, text="y-max:", relief=BUTTON_STYLE, bg=BG_COLOR, font=FONT).pack(side=tk.LEFT, padx=5)
         tk.Entry(row, width=10, textvariable=self.ymax, font=FONT).pack(side=tk.LEFT, padx=5)
         self.show_temperatures_button = tk.Button(
-            row, text='Show Temperatures OFF', fg=BUTTON_TEXT_COLOR, bg=OFF_COLOR, relief=BUTTON_STYLE,
+            row, text='Show Temperatures OFF', fg=BUTTON_TEXT_COLOR, bg=OFF_COLOR, relief=BUTTON_STYLE,  font=FONT,
             command=self.toggle_show_temperatures)
         self.show_temperatures_button.pack(padx=5)
 
         return frame
 
     def plot_initialize(self):
-        plt.rcParams["figure.figsize"] = [13.00, 4.50]
+        plt.rcParams["figure.figsize"] = [13.00, 4.00]
         plt.rcParams["figure.autolayout"] = True
-        plt.rcParams['font.size'] = 14
+        plt.rcParams['font.size'] = 20
         fig, ax = plt.subplots()
-        ax.locator_params(tight=True,nbins=300)
+        ax.locator_params(tight=True,nbins=500)
         ax_right = ax.twinx()
         pressure = self.app.log_controller.pressure_deque
         t_start = self.app.log_controller.t_start
         t_array = self.app.log_controller.t_array
-        sensors = ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges", "Pressure"]
+        sensors = ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges","1","4","5","7","9","Pressure"]
         return fig, ax, ax_right, pressure, t_array, t_start, sensors
 
     def animate(self, i):
@@ -71,7 +71,8 @@ class PlotPanel:
             
             if self.show_temperatures == True:
                 self.ax_right.set_visible(True) 
-                for i in range(6):
+                self.ax_right.set_ylim(0,300)
+                for i in range(11):
                     self.ax_right.plot(self.t_array, [row[i] for row in self.app.log_controller.temperature_deque],THERMOCOUPLE_COLORS[i])
             else:
                 self.ax_right.set_visible(False) 
@@ -80,16 +81,16 @@ class PlotPanel:
             ymax = float(self.ymax.get())
             self.ax.set_ylim(ymin, ymax)
             self.ax.set_yscale('log')
-            self.ax.set_title("Pressure Plot")
+            self.ax.set_title("ALD Run Monitor")
             self.ax.set_xlim(left=self.t_array[0], right=self.t_array[0] + 300)
 
             for j, sensor in enumerate(self.sensors[:-1]):
-                y_position = ymin * (ymax / ymin) ** (0.4 + 0.07 * j)
+                y_position = ymin * (ymax / ymin) ** (0.05 + 0.07 * j)
                 if self.show_temperatures == True:
                     color = THERMOCOUPLE_COLORS
                 else:
                     color = ['k']*7
-                self.ax.text(self.t_array[0] + 250, y_position, f"{sensor}, {str(tempdata[j])[:5]}",color=color[j])
+                self.ax.text(self.t_array[0] + 200, y_position, f"{sensor}, {str(tempdata[j])[:5]}",color=color[j])
             self.fig.tight_layout()
         except Exception as e:
             logging.error("Error during animation: %s", e)
