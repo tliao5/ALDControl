@@ -70,203 +70,190 @@ The control application consists of the following components:
 - "De-spaghettification" of various controllers for an easier modification process
     
 # Function and Class Overview
-## app.py – Main Program
-### Purpose:
-    Runs the main program loop.
-    Sets up logging using Python's logging module.
-    Initializes all controllers and GUI panels.   
-### Structure:  
-- outer_frame – Main container for the GUI.
-- tk.PanedWindow() – Allows dynamic resizing of GUI panels.
 
-Panels:
-- top_pane – Contains the main power button.
-- main_pane – Center content window.
-- horizontal_pane – Divides the center content window into left and right sections.
-- bottom_pane – Contains the manual control panel and ALD run control panel.
+## `app.py` – Main Program
 
-Closing Logic:
-- Calls the close() function for each component to ensure all NI DAQ tasks and threads are properly terminated.
+### **Purpose**  
+- Runs the main program loop.  
+- Sets up logging using Python's logging module.  
+- Initializes all controllers and GUI panels.  
 
-Controllers:
-ald_controller.py – ALD Recipe Controller
-Purpose:
-Manages the execution of ALD recipes by creating a dedicated thread for running the recipe.
-Interfaces with the
-valve_controller
-to control valve operations.
-Communicates with the
-ald_panel
-for pausing and progress tracking.
-Key Functions:
-create_run_thread(loops, vc)
-– Starts a new thread to execute the ALD recipe.
-aldRun(loops, vc, queue)
-– Executes the recipe by pulsing valves based on the recipe file.
-Handles multiple loops and complex valve operations.
-Updates elapsed time for progress tracking.
-close()
-– Safely stops the thread and ensures all valves are closed.
-alicat_controller.py – Alicat Mass Flow Controller (MFC) Interface
-Purpose:
-Provides an interface for communicating with the Alicat MFC via serial communication.
-Manages gas flowrate and pressure settings.
-Key Functions:
-send_command(command)
-– Sends commands to the Alicat device.
-change_setpoint(unit_id, setpoint_value)
-– Sets a new flowrate or pressure setpoint.
-poll_device_data(unit_id)
-– Retrieves current measurements from the device.
-close()
-– Closes the serial connection.
-pressure_controller.py – Pressure Controller
-Purpose:
-Interfaces with the MKS Baratron pressure sensor using
-nidaqmx
-.
-Reads and converts voltage data to pressure values.
-Key Functions:
-read_pressure()
-– Reads pressure data and converts it to Torr.
-close()
-– Closes the
-nidaqmx
-task.
-temp_controller.py – Temperature Controller
-Purpose:
-Manages heaters and thermocouples in the reactor.
-Supports dynamic duty cycles and autoset functionality for Heater 1.
-Key Functions:
-create_heater_tasks()
-– Initializes
-nidaqmx
-tasks for heaters.
-create_thermocouple_tasks()
-– Configures
-nidaqmx
-tasks for thermocouples.
-start_threads()
-– Starts threads for heater duty cycles.
-autoset_duty_cycle()
-– Dynamically adjusts Heater 1's duty cycle based on temperature.
-close()
-– Safely stops threads and closes all tasks.
-valve_controller.py – Valve Controller
-Purpose:
-Manages the operation of valves in the reactor.
-Provides methods to open, close, pulse, and close all valves.
-Key Functions:
-create_valve_tasks()
-– Initializes
-nidaqmx
-tasks for valves.
-open_valve(task)
-– Opens a specific valve.
-close_valve(task)
-– Closes a specific valve.
-pulse_valve(indices, pulse_length)
-– Temporarily opens valves for a specified duration.
-close_all()
-– Closes all valves.
-close()
-– Releases all
-nidaqmx
-resources.
-GUI Panels
-ald_panel.py – ALD Panel
-Purpose:
-Provides controls for starting, pausing, and monitoring ALD runs.
-Key Functions:
-create_ald_panel(parent)
-– Creates the panel with input fields, buttons, and a progress bar.
-start_run()
-– Prepares the run by validating input and calculating runtime.
-confirm_run(loops)
-– Starts the ALD run and disables other controls.
-update_progress_bar()
-– Tracks and displays run progress.
-main_power.py – Main Power Control
-Purpose:
-Manages the main power relay for the reactor.
-Key Functions:
-create_main_power_task()
-– Initializes the
-nidaqmx
-task for the power relay.
-toggle_main_power()
-– Toggles the power state (ON/OFF).
-close()
-– Ensures the relay is turned off and the task is closed.
-manual_control_panel.py – Manual Control Panel
-Purpose:
-Allows users to load recipe files and manually control valves.
-Key Functions:
-load_file()
-– Loads a recipe file and updates the
-ald_controller
-.
-open_manual_control()
-– Opens a sub-panel for manual valve operations.
-heater_control_panel.py – Heater Control Panel
-Purpose:
-Provides controls for managing heater duty cycles, maximum temperature settings, and gas flowrates.
-Interfaces with the
-temp_controller
-for heater operations and the Alicat MFC for flowrate adjustments.
-Key Functions:
-create_heater_control_panel()
-– Creates entry fields and buttons for heater and flowrate controls.
-set_duty_value(i, duty_cycle_var)
-– Updates the duty cycle for a specific heater.
-set_max_temp(i, max_temp_var)
-– Sets the maximum temperature limit for a specific heater.
-change_setpt(setpt_var)
-– Updates the Alicat MFC flowrate setpoint.
-change_autoset(autoset_temp_var)
-– Enables or disables autoset functionality for Heater 1.
-plot_panel.py – Plot Panel
-Purpose:
-Provides real-time monitoring of pressure and temperature data using
-matplotlib
-.
-Integrates with the
-log_controller
-to retrieve and display data dynamically.
-Key Functions:
-plot_initialize()
-– Sets up the plot with default settings.
-animate(i)
-– Updates the plot with real-time data from pressure and temperature sensors.
-toggle_show_temperatures()
-– Toggles the visibility of temperature data on the plot.
-close()
-– Ensures proper cleanup of
-matplotlib
-resources.
-log_controller.py – Log Controller
-Purpose:
-Manages data logging, real-time monitoring, and safety mechanisms for the reactor.
-Monitors temperature thresholds to prevent overheating and triggers safety measures when necessary.
-Key Functions:
-record_data()
-– Collects sensor data and logs it to the main and monitor log files.
-update_max_temp(i, max_temp)
-– Updates the maximum temperature threshold for a specific sensor.
-kill_run()
-– Pauses the ALD run and disables main power during overheating events.
-close()
-– Safely stops the logging thread and releases resources.
-Sources:
-Python Libraries:
+### **Structure**  
+- `outer_frame` – Main container for the GUI.  
+- `tk.PanedWindow()` – Allows dynamic resizing of GUI panels.  
 
-tkinter
-– Used for building the graphical user interface.
-matplotlib
-– Used for real-time plotting of pressure and temperature data.
-nidaqmx
-– Used for interfacing with NI DAQ hardware for sensor and actuator control.
-serial
-– Used for communicating with the Alicat Mass Flow Controller.
-logging
-– Used for logging events and data for monitoring and debugging.
+### **Panels**  
+- `top_pane` – Contains the main power button.  
+- `main_pane` – Center content window.  
+- `horizontal_pane` – Divides the center content window into left and right sections.  
+- `bottom_pane` – Contains the manual control panel and ALD run control panel.  
+
+### **Closing Logic**  
+- Calls the `close()` function for each component to ensure all NI DAQ tasks and threads are properly terminated.  
+
+---
+
+## Controllers
+
+### `ald_controller.py` – ALD Recipe Controller
+
+#### **Purpose**  
+- Manages the execution of ALD recipes by creating a dedicated thread for running the recipe.  
+- Interfaces with the `valve_controller` to control valve operations.  
+- Communicates with the `ald_panel` for pausing and progress tracking.  
+
+#### **Key Functions**  
+- `create_run_thread(loops, vc)` – Starts a new thread to execute the ALD recipe.  
+- `aldRun(loops, vc, queue)` – Executes the recipe by pulsing valves based on the recipe file. Handles multiple loops and complex valve operations. Updates elapsed time for progress tracking.  
+- `close()` – Safely stops the thread and ensures all valves are closed.  
+
+---
+
+### `alicat_controller.py` – Alicat Mass Flow Controller (MFC) Interface
+
+#### **Purpose**  
+- Provides an interface for communicating with the Alicat MFC via serial communication.  
+- Manages gas flowrate and pressure settings.  
+
+#### **Key Functions**  
+- `send_command(command)` – Sends commands to the Alicat device.  
+- `change_setpoint(unit_id, setpoint_value)` – Sets a new flowrate or pressure setpoint.  
+- `poll_device_data(unit_id)` – Retrieves current measurements from the device.  
+- `close()` – Closes the serial connection.  
+
+---
+
+### `pressure_controller.py` – Pressure Controller
+
+#### **Purpose**  
+- Interfaces with the MKS Baratron pressure sensor using `nidaqmx`.  
+- Reads and converts voltage data to pressure values.  
+
+#### **Key Functions**  
+- `read_pressure()` – Reads pressure data and converts it to Torr.  
+- `close()` – Closes the `nidaqmx` task.  
+
+---
+
+### `temp_controller.py` – Temperature Controller
+
+#### **Purpose**  
+- Manages heaters and thermocouples in the reactor.  
+- Supports dynamic duty cycles and autoset functionality for Heater 1.  
+
+#### **Key Functions**  
+- `create_heater_tasks()` – Initializes `nidaqmx` tasks for heaters.  
+- `create_thermocouple_tasks()` – Configures `nidaqmx` tasks for thermocouples.  
+- `start_threads()` – Starts threads for heater duty cycles.  
+- `autoset_duty_cycle()` – Dynamically adjusts Heater 1's duty cycle based on temperature.  
+- `close()` – Safely stops threads and closes all tasks.  
+
+---
+
+### `valve_controller.py` – Valve Controller
+
+#### **Purpose**  
+- Manages the operation of valves in the reactor.  
+- Provides methods to open, close, pulse, and close all valves.  
+
+#### **Key Functions**  
+- `create_valve_tasks()` – Initializes `nidaqmx` tasks for valves.  
+- `open_valve(task)` – Opens a specific valve.  
+- `close_valve(task)` – Closes a specific valve.  
+- `pulse_valve(indices, pulse_length)` – Temporarily opens valves for a specified duration.  
+- `close_all()` – Closes all valves.  
+- `close()` – Releases all `nidaqmx` resources.  
+
+---
+
+## GUI Panels
+
+### `ald_panel.py` – ALD Panel
+
+#### **Purpose**  
+- Provides controls for starting, pausing, and monitoring ALD runs.  
+
+#### **Key Functions**  
+- `create_ald_panel(parent)` – Creates the panel with input fields, buttons, and a progress bar.  
+- `start_run()` – Prepares the run by validating input and calculating runtime.  
+- `confirm_run(loops)` – Starts the ALD run and disables other controls.  
+- `update_progress_bar()` – Tracks and displays run progress.  
+
+---
+
+### `main_power.py` – Main Power Control
+
+#### **Purpose**  
+- Manages the main power relay for the reactor.  
+
+#### **Key Functions**  
+- `create_main_power_task()` – Initializes the `nidaqmx` task for the power relay.  
+- `toggle_main_power()` – Toggles the power state (ON/OFF).  
+- `close()` – Ensures the relay is turned off and the task is closed.  
+
+---
+
+### `manual_control_panel.py` – Manual Control Panel
+
+#### **Purpose**  
+- Allows users to load recipe files and manually control valves.  
+
+#### **Key Functions**  
+- `load_file()` – Loads a recipe file and updates the `ald_controller`.  
+- `open_manual_control()` – Opens a sub-panel for manual valve operations.  
+
+---
+
+### `heater_control_panel.py` – Heater Control Panel
+
+#### **Purpose**  
+- Provides controls for managing heater duty cycles, maximum temperature settings, and gas flowrates.  
+- Interfaces with the `temp_controller` for heater operations and the Alicat MFC for flowrate adjustments.  
+
+#### **Key Functions**  
+- `create_heater_control_panel()` – Creates entry fields and buttons for heater and flowrate controls.  
+- `set_duty_value(i, duty_cycle_var)` – Updates the duty cycle for a specific heater.  
+- `set_max_temp(i, max_temp_var)` – Sets the maximum temperature limit for a specific heater.  
+- `change_setpt(setpt_var)` – Updates the Alicat MFC flowrate setpoint.  
+- `change_autoset(autoset_temp_var)` – Enables or disables autoset functionality for Heater 1.  
+
+---
+
+### `plot_panel.py` – Plot Panel
+
+#### **Purpose**  
+- Provides real-time monitoring of pressure and temperature data using `matplotlib`.  
+- Integrates with the `log_controller` to retrieve and display data dynamically.  
+
+#### **Key Functions**  
+- `plot_initialize()` – Sets up the plot with default settings.  
+- `animate(i)` – Updates the plot with real-time data from pressure and temperature sensors.  
+- `toggle_show_temperatures()` – Toggles the visibility of temperature data on the plot.  
+- `close()` – Ensures proper cleanup of `matplotlib` resources.  
+
+---
+
+### `log_controller.py` – Log Controller
+
+#### **Purpose**  
+- Manages data logging, real-time monitoring, and safety mechanisms for the reactor.  
+- Monitors temperature thresholds to prevent overheating and triggers safety measures when necessary.  
+
+#### **Key Functions**  
+- `record_data()` – Collects sensor data and logs it to the main and monitor log files.  
+- `update_max_temp(i, max_temp)` – Updates the maximum temperature threshold for a specific sensor.  
+- `kill_run()` – Pauses the ALD run and disables main power during overheating events.  
+- `close()` – Safely stops the logging thread and releases resources.  
+
+---
+
+## Sources
+
+### **Python Libraries**  
+- **`tkinter`** – Used for building the graphical user interface.  
+- **`matplotlib`** – Used for real-time plotting of pressure and temperature data.  
+- **`nidaqmx`** – Used for interfacing with NI DAQ hardware for sensor and actuator control.  
+- **`serial`** – Used for communicating with the Alicat Mass Flow Controller.  
+- **`logging`** – Used for logging events and data for monitoring and debugging.  
+
+---
