@@ -46,7 +46,7 @@ Logging/Plotting:
     The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
 
 Timers:
-    Two timers are active during a run: the main thread's elapsed time and the aldRun thread's elapsed time. These are synchronized manually but may be updated in the future.
+    - Two timers are active during a run: the main thread's elapsed time and the aldRun thread's elapsed time. These are synchronized manually but may be updated in the future.
 
 Threads:
     app.py is the main thread
