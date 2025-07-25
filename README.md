@@ -70,6 +70,7 @@ The control application consists of the following components:
 - "De-spaghettification" of various controllers for an easier modification process
     
 # Function and Class Overview
+---
 
 ## `app.py` – Main Program
 
@@ -90,6 +91,34 @@ The control application consists of the following components:
 
 ### **Closing Logic**  
 - Calls the `close()` function for each component to ensure all NI DAQ tasks and threads are properly terminated.  
+
+---
+
+# `config.py` - Configuration File
+
+## Summary
+This config defines the constants and configuration settings used throughout the ALD reactor control program. These constants include visual style for the GUI, log file paths, hardware channels, and operational parameters for the system's components.
+
+---
+
+## Key Features
+
+### GUI Styling
+- Defines colors, fonts, and button styles for the graphical user interface.
+
+### Logging Configuration
+- Specifies file paths for application logs (`PressureTempJuly.log`) and monitoring logs (`monitor.log`).
+
+### Hardware Channel Mappings
+- Maps control channels for main power, valves, heaters, temperature sensors, and pressure sensors to specific hardware ports.
+
+### Operational Parameters
+- Sets default values for pressure plot limits (`Y_MIN_DEFAULT` and `Y_MAX_DEFAULT`).
+- Configures duty cycle length for heater operations.
+
+### Sensor and Port Settings
+- Lists temperature sensor channels and their corresponding names.
+- Defines the communication port for the mass flow controller (`MFC_PORT`).
 
 ---
 
