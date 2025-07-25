@@ -45,30 +45,34 @@ The control application consists of the following components:
 # Notes
 Logging/Plotting:
     
-    Logging occurs every 0.5s when the log_controller gathers data and log records from various parts of the program
-    The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
+    - Logging occurs every 0.5s when the log_controller gathers data and log records from various parts of the program
+    - The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
 
 Timers:
+
     - Two timers are active during a run: the main thread's elapsed time and the aldRun thread's elapsed time. These are synchronized manually but may be updated in the future.
 
 Threads:
-    app.py is the main thread
-    Additional threads include:
+
+    - app.py is the main thread
+    - Additional threads include:
         – ALD run thread (ald_controller)
         – Heater duty cycle threads (temp_controller)
         - Logging thread (log_controller)
-    Thread communicate mostly via python queue.Queue() objects
+    - Thread communicate mostly via python queue.Queue() objects
     
 Tkinter .after() Events:
-    ald_panel.update_progress_bar()
+
+    - ald_panel.update_progress_bar()
         – Updates every ~900ms to control the run timer in the main thread.
         
 Shutdown:
-    All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
+    - All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
 
 Planned Features:
-    Performance improvements to enhance display smoothness and reduce latency.
-    De-spaghettification of various controllers
+    - Performance improvements to enhance display smoothness and reduce latency.
+    - "De-spaghettification" of various controllers for an easier modification process
+    
 # Function and Class Overview
     app.py – Main Program
 Purpose:
