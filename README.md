@@ -94,29 +94,26 @@ The control application consists of the following components:
 
 ---
 
-# `config.py` - Configuration File
+### `config.py` - Configuration File
 
-## Summary
 This config defines the constants and configuration settings used throughout the ALD reactor control program. These constants include visual style for the GUI, log file paths, hardware channels, and operational parameters for the system's components.
 
----
+### Key Features
 
-## Key Features
-
-### GUI Styling
+#### GUI Styling
 - Defines colors, fonts, and button styles for the graphical user interface.
 
-### Logging Configuration
+#### Logging Configuration
 - Specifies file paths for application logs (`PressureTempJuly.log`) and monitoring logs (`monitor.log`).
 
-### Hardware Channel Mappings
+#### Hardware Channel Mappings
 - Maps control channels for main power, valves, heaters, temperature sensors, and pressure sensors to specific hardware ports.
 
-### Operational Parameters
+#### Operational Parameters
 - Sets default values for pressure plot limits (`Y_MIN_DEFAULT` and `Y_MAX_DEFAULT`).
 - Configures duty cycle length for heater operations.
 
-### Sensor and Port Settings
+#### Sensor and Port Settings
 - Lists temperature sensor channels and their corresponding names.
 - Defines the communication port for the mass flow controller (`MFC_PORT`).
 
