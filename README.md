@@ -43,37 +43,31 @@ The control application consists of the following components:
 10. Press "Confirm" to begin the ALD run.
 ```
 # Notes
-Logging/Plotting:
+## Logging/Plotting:
 
-    - Logging occurs every 0.5s when the log_controller gathers data and log records from various parts of the program
-    - The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
+- Logging occurs every 0.5s when the log_controller gathers data and log records from various parts of the program
 
-Timers:
+- The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
 
-    - Two timers are active during a run: the main thread's elapsed time and the aldRun thread's elapsed time. These are synchronized manually but may be updated in the future.
+## Timers:
+- Two timers are active during a run: the main thread's elapsed time and the aldRun thread's elapsed time. These are synchronized manually but may be updated in the future.
 
-Threads:
-
-    - app.py is the main thread
-    - Additional threads include:
-        – ALD run thread (ald_controller)
-        – Heater duty cycle threads (temp_controller)
-        - Logging thread (log_controller)
-    - Thread communicate mostly via python queue.Queue() objects
+## Threads:
+- app.py is the main thread
+- Additional threads include:
+    - ALD run thread (ald_controller)
+    - Heater duty cycle threads (temp_controller)
+    - Logging thread (log_controller)
+- Thread communicate mostly via python queue.Queue() objects
+- All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
     
-Tkinter .after() Events:
+## Tkinter .after() Events:
+- ald_panel.update_progress_bar()
+- Updates every ~900ms to control the run timer in the main thread.        
 
-    - ald_panel.update_progress_bar()
-        – Updates every ~900ms to control the run timer in the main thread.
-        
-Shutdown:
-
-    - All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
-
-Planned Features:
-
-    - Performance improvements to enhance display smoothness and reduce latency.
-    - "De-spaghettification" of various controllers for an easier modification process
+## Planned Features:
+- Performance improvements to enhance display smoothness and reduce latency
+- "De-spaghettification" of various controllers for an easier modification process
     
 # Function and Class Overview
 ## app.py – Main Program
@@ -82,16 +76,19 @@ Planned Features:
     Sets up logging using Python's logging module.
     Initializes all controllers and GUI panels.   
 ### Structure:  
-outer_frame – Main container for the GUI.
-tk.PanedWindow() – Allows dynamic resizing of GUI panels.
+- outer_frame – Main container for the GUI.
+- tk.PanedWindow() – Allows dynamic resizing of GUI panels.
+
 Panels:
-    top_pane– Contains the main power button.
-    main_pane – Center content window.
-    horizontal_pane – Divides the center content window into left and right sections.
-    bottom_pane – Contains the manual control panel and ALD run control panel.
+- top_pane – Contains the main power button.
+- main_pane – Center content window.
+- horizontal_pane – Divides the center content window into left and right sections.
+- bottom_pane – Contains the manual control panel and ALD run control panel.
+
 Closing Logic:
-    Calls the close() function for each component to ensure all NI DAQ tasks and threads are properly terminated.
-Controllers
+- Calls the close() function for each component to ensure all NI DAQ tasks and threads are properly terminated.
+
+Controllers:
 ald_controller.py – ALD Recipe Controller
 Purpose:
 Manages the execution of ALD recipes by creating a dedicated thread for running the recipe.
