@@ -67,20 +67,25 @@ Tkinter .after() Events:
         – Updates every ~900ms to control the run timer in the main thread.
         
 Shutdown:
+
     - All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
 
 Planned Features:
+
     - Performance improvements to enhance display smoothness and reduce latency.
     - "De-spaghettification" of various controllers for an easier modification process
     
 # Function and Class Overview
     app.py – Main Program
 Purpose:
+
     Runs the main program loop.
     Sets up logging using Python's logging module.
     Initializes all controllers and GUI panels.
-Structure:
+    
+Structure:  
 outer_frame
+
 – Main container for the GUI.
 tk.PanedWindow()
 – Allows dynamic resizing of GUI panels.
