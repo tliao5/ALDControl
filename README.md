@@ -3,6 +3,7 @@
 The ALD Control software manages various aspects of the ALD Reactor, including temperature, pressure, valve operations, and carrier gas flow. It integrates hardware control via NI DAQ and Alicat Mass Flow Controller, and provides a graphical interface built with Python's tkinter package.
 
 **Hardware Integration**
+
 ╚ Via NI DAQ
    └ Thermocouples – Temperature Reading
    └ MKS Baratron – Pressure Reading
@@ -14,7 +15,9 @@ The ALD Control software manages various aspects of the ALD Reactor, including t
 The control application consists of the following components:
 
 **app.py** – The main program loop, initializes all controllers and GUI panels
+
 **config.py** - System configuration and visual style 
+
 ╚ **controllers** ================== Controls different aspects of the reactor using nidaqmx functionality  
    └ *ald_controller* -----------– ALD run cycle logic, creates new thread at run start  
    └ *mfc_reader* ---------------– Alicat flow control interface  
