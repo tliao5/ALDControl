@@ -4,12 +4,12 @@ The ALD Control software manages various aspects of the ALD Reactor, including t
 
 **Hardware Integration**
 
-╚ Via NI DAQ
-   └ Thermocouples – Temperature Reading
-   └ MKS Baratron – Pressure Reading
-   └ Band Heaters – System Temperature Control
-   └ Swagelok ALD Valves – Run Cycle Control
-╚ Alicat Mass Flow Controller – Carrier Gas Flow
+╚ Via NI DAQ 
+   └ Thermocouples – Temperature Reading 
+   └ MKS Baratron – Pressure Reading 
+   └ Band Heaters – System Temperature Control 
+   └ Swagelok ALD Valves – Run Cycle Control 
+╚ Alicat Mass Flow Controller – Carrier Gas Flow 
 
 ## Software Components
 The control application consists of the following components:
