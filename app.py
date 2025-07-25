@@ -2,7 +2,7 @@ import tkinter as tk
 
 from config import *
 from gui_panels.main_power import MainPower
-from gui_panels.number_display_panel import NumberDisplayPanel
+from gui_panels.heater_control_panel import HeaterControlPanel
 from gui_panels.plot_panel import PlotPanel
 from gui_panels.ald_panel import ALDPanel
 from gui_panels.manual_control_panel import ManualControlPanel
@@ -51,19 +51,19 @@ class ALDApp(tk.Tk):
 
         self.temp_controller.start_threads()
 
-        self.alicat = alicat = AlicatController(port=MFC_PORT)
+        #self.alicat = alicat = AlicatController(port=MFC_PORT)
         #self.alicat.change_setpoint(setpoint_value=0.0)
 
         # Initialize components
         self.main_power = MainPower(self)
-        self.number_display_panel = NumberDisplayPanel(self)
+        self.heater_control_panel = HeaterControlPanel(self)
         self.plot_panel = PlotPanel(self)
         self.ald_panel = ALDPanel(self)
         self.manual_control_panel = ManualControlPanel(self)
 
         self.create_layout()
         print("ALD Control GUI Initialized")
-        self.logger.info("ALD Control Initialized")
+        self.logger.info("ALD Control GUI Initialized")
 
     def create_layout(self):
         # outer frame contains all other frames
@@ -79,17 +79,17 @@ class ALDApp(tk.Tk):
         self.main_power.create_main_power_button(top_frame)
         top_pane.add(top_frame)
 
-        # main content area - will contain plot_panel and number_display_panel
+        # main content area - will contain plot_panel and heater_control_panel
         main_pane = tk.PanedWindow(top_pane, orient=tk.VERTICAL, bg=BG_COLOR, bd=0, sashwidth=5)
         main_pane.grid_rowconfigure(0, weight=1)
         main_pane.grid_columnconfigure(0, weight=1)
         top_pane.add(main_pane)
 
-        # sets up the two areas for plot_panel and number_display_panel
+        # sets up the two areas for plot_panel and heater_control_panel
         horizontal_pane = tk.PanedWindow(main_pane, orient=tk.HORIZONTAL, bg=BG_COLOR, bd=0, sashwidth=5)
         main_pane.add(horizontal_pane)
         horizontal_pane.add(self.plot_panel.create_plot_panel("Left Panel Plot"))
-        horizontal_pane.add(self.number_display_panel.create_number_display_panel())
+        horizontal_pane.add(self.heater_control_panel.create_heater_control_panel())
         horizontal_pane.grid_rowconfigure(0, weight=1)
         horizontal_pane.grid_columnconfigure(0, weight=1)
         horizontal_pane.grid_columnconfigure(1, weight=1)
@@ -104,7 +104,7 @@ class ALDApp(tk.Tk):
         print("GUI closing")
         self.log_controller.close()
         self.plot_panel.close()
-        self.number_display_panel.close()
+        self.heater_control_panel.close()
         self.temp_controller.close()
         self.pressure_controller.close()
         self.ald_controller.close()
@@ -113,6 +113,7 @@ class ALDApp(tk.Tk):
         
         self.destroy()
         print("Program Closed")
+        self.logger.info("ALD Control GUI Closed")
 
 
 if __name__ == "__main__":

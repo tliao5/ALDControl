@@ -1,293 +1,293 @@
-# ALDControl  
+ALDControl
 ALD Control System Overview
-The ALD Control software controls these aspects of the ALD Reactor  
-╚ Via NI DAQ  
-   └ Thermocouples – Temperature Reading  
-   └ MKS Baratron – Pressure Reading  
-   └ Band Heaters – System Temperature Control  
-   └ Swagelok ALD Valves – Run Cycle Control  
-╚ Alicat Mass Flow Controller – Carrier Gas Flow  
-  
-The control application uses Python’s Tkinter package and consists of the below component  
-```
-    app.py – The main program loop, also initializes of all controllers and GUI Panels  
-    ╚ controller ================== control different aspects of the reactor, using nidaqmx functionality  
-       └ ald_controller -----------– ALD Run cycle logic, creates new thread at run start  
+The ALD Control software manages various aspects of the ALD Reactor, including temperature, pressure, valve operations, and carrier gas flow. It integrates hardware control via NI DAQ and Alicat Mass Flow Controller, and provides a user-friendly graphical interface built with Python's
+tkinter
+package.
+
+Hardware Integration
+╚ Via NI DAQ
+└ Thermocouples – Temperature Reading
+└ MKS Baratron – Pressure Reading
+└ Band Heaters – System Temperature Control
+└ Swagelok ALD Valves – Run Cycle Control
+╚ Alicat Mass Flow Controller – Carrier Gas Flow
+
+Software Components
+The control application consists of the following components:
+
+    app.py – The main program loop, initializes all controllers and GUI panels  
+    ╚ controller ================== Controls different aspects of the reactor using nidaqmx functionality  
+       └ ald_controller -----------– ALD run cycle logic, creates new thread at run start  
        └ mfc_reader ---------------– Alicat flow control interface  
-       └ pressure_controller ------– pressure reading from MKS Baratron  
-       └ temp_controller ----------– temperature reading from thermocouples, creates 3 threads to control heaters.  
-       └ valve_controller ---------– logic to open, close, and pulse valves  
-    ╚ gui_panel =================== allow the user to interface with the controllers   
-       └ main_power ---------------- button that turns on and off the main power relay  
-       └ ald_panel ----------------- run start controls  
-       └ manual_control_panel -----– manual ALD valve control and file loading  
-       └ number_display_panel -----– heater and mass flow control  
-       └ plot_panel ----------------  real time display of pressures and temperatures  
-```
-  
-How to start a run:
-1. Doublecheck config file to make sure log file, etc. are correct
-2. Run app.py in command line
-3. Press the "Main Power" button at the top to turn on heater and valve controls
-4. Set duty values to each heater to heat up system (turn on variac - soon to be replaced by another nidaqmx controlled heater band)
-5. Press the "Load File" button and select the recipe file
-6. Review the recipe file
-7. Enter the number of cycles into the "Loops" field
-8. Press "Confirm" to begin the ALD run
+       └ pressure_controller ------– Pressure reading from MKS Baratron  
+       └ temp_controller ----------– Temperature reading from thermocouples, creates threads to control heaters  
+       └ valve_controller ---------– Logic to open, close, and pulse valves  
+    ╚ gui_panel =================== Allows the user to interface with the controllers   
+       └ main_power ---------------- Button that turns on and off the main power relay  
+       └ ald_panel ----------------- Run start controls  
+       └ manual_control_panel -----– Manual ALD valve control and file loading  
+       └ heater_control_panel -----– Heater and mass flow control  
+       └ plot_panel ---------------- Real-time display of pressures and temperatures  
+How to Start a Run
+Double-check the
+config.py
+file to ensure log file paths and other settings are correct.
+Run
+app.py
+in the command line.
+Press the "Main Power" button at the top to enable heater and valve controls.
+Set duty values for each heater to heat up the system.
+Press the "Load File" button and select the recipe file.
+Review the recipe file displayed in the GUI.
+Enter the number of cycles into the "Loops" field.
+Press "Confirm" to begin the ALD run.
+Notes
+Logging:
 
-Notes:
-- Currently logging is done at each update call of the animate() function from plot_panel
-- The main plot shown is Pressure vs. Samples, not Pressure vs. Time
-	- This is coming from the MKS Baratron which takes a sample approximately once per second, but timing is variable
-
-- There are two timers that are active during a run, the main thread elapsed_time, and the aldRun thread's elapsed time. I force them to sync, but may update how this is arranged in the future
-
-- app.py runs in the main thread
-    - aldRun ------ ALD run thread
-    - h1dutycycle - controls heater 1 duty cycle
-    - h2dutycycle - controls heater 2 duty cycle
-    - h3dutycycle - controls heater 3 duty cycle
--  .after() events: consistent updates to other parts of the system using tkinter's built in event queue .after() function
-    - ald_panel.update_progress_bar() - calls every "900ms" but likely a bit slower due to latency, controls run timer in the main thread
-    - number_display_panel.update_setpoint_reading(self) - calls every "1000ms", could probably be less frequent
-
-- All threads and tasks should close automatically when the program is closed, but may take some time
-
-Planned Features:
-- Automatic temperature adjustment to fine tune accuracy of duty cycle temperature control
-- Pause Run feature, allowing adjustments to be made mid-run
-- Performance increases? look into smoothness of display, currently pretty laggy
-
-===================Function and Class Overview==============
-
-app.py - main program
--run main program
--setup logging using Python logging module
--initializes all controllers
--initializes all panels
-    - outer_frame = tk.Frame() used for the main box
-
-    tk.PanedWindow() allows the widows to be resized dynamically inside the gui
-    - top_pane - holds top_frame which contains the main power button
-    - main_pane - center content window
-    - horizontal_pane - divides the center content window into left and right
-    - bottom_pane - holds the manual control panel and the ALD run control panel
--closing logic
-    - calls the close function from each component, making sure all NI DAQ tasks and threads are closed
-
-
-Controllers:
-ald_controller() ALD Run cycle logic
-    - initializes self.stopthread = threading.Event(), used to close the recipe thread
-    - initializes self.queue = queue.Queue(), manages passing data to and from the thread
-     
-    - create_run_thread(self, loops, vc) starts a new thread running the aldRun() function
-    	- loops = number of ALD cycles specified by user
-    	- vc = valve_controller object 
-    
-    - aldRun(self,loops,vc,queue) pulses valves at time specified by recipe file
-        - loops = number of ALD cycles specified by user
-        - vc = valve_controller object
-        - queue = ald_controller's queue, right now used to pass elapsed time
-	
-	- accesses recipe file stored in ald_controller.file
-	- for i in range(loops) -------------------- based on number of cycles
-		- for j in range(0,len(dataNP),1) -- goes down columns in recipe, dataNP
-			loop logic:
-			- exits early if stopthread is triggered
-			
-			- otherwise, reads the current row to see which valves to trigger
-			- store the index of each triggered valve
-			
-			- if there are valves to pulse, call pulse_valve()
-			- if no valves found, instead wait and purge
-			
-			- add up time of each cycle, send elapsed_time back through queue
-
-
-mfc_reader(self, port) Alicat Controller, we only use some of its functions
-    - initialize Alicat serial communication
-    
-    - send_command(self, command)
-    	- used by other functions to send a command to the Alicat 
-
-    - poll_device_data(self,unit_id='A')
-	- returns a string of device readings, we use this to extract flowrate 
-
-    - change_setpoint(self,unit_id='A',setpoint_value=0.0)
-	- changes setpoint to new value
-
-pressure_controller
-    - initializes nidaqmx task for MKS Baratron
-
-    -  read_pressure(self)
-	- reads voltage, convert to torr 
-
-    - readPressure_pdr2000(self)
-    	- unused
-
-    - close(self)
-	- closes nidaqmx task 
-
-temp_controller
-    - initializes Heater nidaqmx tasks and Thermocouple nidaqmx tasks
-    - initializes queue for communication with heater threads
-    - initializes heater threads
-
-    - create_heater_queue(self)
-	- returns list of queues for temp_controller.queues[:]
-    - create_heater_tasks(self)
-    	- returns a list of taks for temp_controller.tasks[:]
-    - start_threads(self)
-	- returns duty cycle threads, one for each heater
-    - create_thermocouple_tasks(self)
-	- sets up thermocouple channels
-	- returns task for thermocouples
-
-    - read_thermocouples(self)
-	- returns a string containing readings from all thermocouples
-
-    - duty_cycle(self,stopthread,duty_queue,task,tps) runs duty cycle
-	- while loop, check if stopthread is set to stop cycle
-	- otherwise, check if duty_queue has a new value
-		- update duty value
-	- check if voltage should be on or off based on cycle timing, sleep, repeat
-	- after loop, shut down nidaqmx task
-
-    - update_duty_cycle(self,queue,duty)
-	- check if duty cycle value is valid
-		- send updated duty to specified thread
-
-    - close(self)
-	- join all threads, close thermocouple nidaqmx task
-
-valve_controller
-    - initialize create valve tasks
-
-    - create_valve_tasks(self)
-	- returns 3 tasks, one for each heater 
-    
-    - open_valve(self, task)
-    	- opens specified valve, sleeps for 0.1s to make sure valve has time to open
-
-    - close_valve(self,task)
-	- closes specified valve, sleeps for 0.1s to make sure valve has time to open
-
-    - pulse_valve(self,indicies,pulse_length)
-	- indicies refers to the index in the task array of the valve(s) to be pulsed 
-	- pulses valve for length pulse_length
-	- intended to support multiple valves pulsing simultaneously, need to add support for different pulse_lengths by valve
-
-    - close_all(self)
-	- closes all valves, used at end of program and before closing software to make sure all valves are shut
-
-    - close(self)
-	- closes all valve tasks
-
-
-GUI Panels
-ald_panel
-    - initializes blank variables and creates panels
-    
-    - create_ald_panel(self,parent) called during app startup to generate panel
-	- creates loops entry field and run button
-	- creates progress bar
-	- displays what log file is listed in config
-
-    - start_run(self)
-	- called when Run Recipe button is press, prompts confirmation
-	- calculate run time for progress bar display
-    
-    - confirm_run(self,loops)
-	- disables all other panel buttons, including manual panel buttons until run is over
-	- actually starts the loop by calling create_run_thread() from ald_controller
-    
-    - update_progress_bar(self)
-	- tracks progress on the GUI side, (the real run time is controlled from the aldRun thread)
-	- kind of a hacky solution, polls the elapsed_time from the aldRun to make sure they stay synced
-	- On run finish, 
-		- calls enable_manual_controls()
-	 	- reenables ald_panel buttons
-
-    - format_time(self,seconds)
-	- utility function returns a string converting seconds to HH:MM:SS time format
-
-    - disable_manual_controls(self)
-    - enable_manual_controls(self)
-	
-
-main_power
-    - initializes by calling create_main_power_task()
-
-    - create_main_power_task(self)
-	- creates nidaqmx task for main power relay
-
-    - create_main_power_button(self,parent)
-	- called during app startup
-	- creates main power button, default off
-
-    - toggle_main_power(self)
-	- called when main_power_button is pressed
-	- uses main_power_button text and color to track whether or not power is on or off
-	- toggles to other state
-
-    - close(self)
-	- turns off main power
-	- closes main power task
-
-manual_control_panel
-    - initializes default variables
-    
-    - create_manual_controls(self,parent)
-    	- called during app startup
-	
-	- creates buttons to open the manual control window and load files
-
-    - load_file(self)
-	- asks user to select file
-	- gets file title, updates file reference in ALD Controller
-	- calls displa_csv(file_path)
-
-    - display_csv(file_path)
-	- clears old csv panel
-	- opens file
-	- loop row by row, filling in values
-
-    - open_manual_control(self)
-	- creates a new subwindow using tk.Toplevel
-	- allows manual opening, closing, and pulsing of valve using valve_controller commands
-
-
-number_display_panel
-    - initializes blank heater_buttons
-
-    - create_number_display_panel(self)
-    	- self.duty - list of duty cycle entry fields
-    	- creates heater buttons which send value from the entry field to set_duty_value()
-	- display text key for which heater corresponds to what part of the system
-    	- set_duty_value(self,i,duty_cycle_var)
-		- i = which heater button this is, corresponding to the duty cycle thread to be targetted
-		- duty_cycle_var = tk.Stringvar() from the entry field
-		- updates color to show whether or not heater is active, updates duty value by calling update_duty_cycle()
-
-    - to be added: temperature automatic adjustment
-
+Logging occurs at each update call of the
+animate()
+function in
 plot_panel
-    - initializes plot and sensors, - eventually update to call values from config
+.
+The main plot shows Pressure vs. Samples, not Pressure vs. Time.
+Timers:
 
-    - plot_initialize(self)
-	- creates plot with default values
-	- creates deque() for pressure and time in order to display
-	- deque set to automatically limit the number of values saved to be displayed
+Two timers are active during a run: the main thread's elapsed time and the
+aldRun
+thread's elapsed time. These are synchronized but may be updated in the future.
+Threads:
 
-    - animate(self,i)
-	- call data from thermocouples and pressure reading, update deque-s
-	- log data to log file
-	- update y-axis size
-	- clear old plot
-	- create new plot using deque-s
-	- display thermocouple readings in a list
-		- position automatically scaled based on y-axis size
+app.py
+runs in the main thread.
+Additional threads include:
+aldRun
+– ALD run thread
+h1dutycycle
+,
+h2dutycycle
+,
+h3dutycycle
+– Heater duty cycle threads
+Tkinter
+.after()
+Events:
 
-    - close(self)
-	- close plot
+ald_panel.update_progress_bar()
+– Updates every ~900ms to control the run timer in the main thread.
+heater_control_panel.update_setpoint_reading()
+– Updates every ~1000ms to read flowrate setpoints.
+Shutdown:
+
+All threads and tasks should close automatically when the program is terminated, but this may take some time.
+Planned Features
+Automatic temperature adjustment for fine-tuning duty cycle control.
+Pause Run feature to allow adjustments mid-run.
+Performance improvements to enhance display smoothness and reduce latency.
+Function and Class Overview
+app.py – Main Program
+Purpose:
+Runs the main program loop.
+Sets up logging using Python's
+logging
+module.
+Initializes all controllers and GUI panels.
+Structure:
+outer_frame
+– Main container for the GUI.
+tk.PanedWindow()
+– Allows dynamic resizing of GUI panels.
+Panels:
+top_pane
+– Contains the main power button.
+main_pane
+– Center content window.
+horizontal_pane
+– Divides the center content window into left and right sections.
+bottom_pane
+– Contains the manual control panel and ALD run control panel.
+Closing Logic:
+Calls the
+close()
+function for each component to ensure all NI DAQ tasks and threads are properly terminated.
+Controllers
+ald_controller.py – ALD Recipe Controller
+Purpose:
+Manages the execution of ALD recipes by creating a dedicated thread for running the recipe.
+Interfaces with the
+valve_controller
+to control valve operations.
+Communicates with the
+ald_panel
+for pausing and progress tracking.
+Key Functions:
+create_run_thread(loops, vc)
+– Starts a new thread to execute the ALD recipe.
+aldRun(loops, vc, queue)
+– Executes the recipe by pulsing valves based on the recipe file.
+Handles multiple loops and complex valve operations.
+Updates elapsed time for progress tracking.
+close()
+– Safely stops the thread and ensures all valves are closed.
+alicat_controller.py – Alicat Mass Flow Controller (MFC) Interface
+Purpose:
+Provides an interface for communicating with the Alicat MFC via serial communication.
+Manages gas flowrate and pressure settings.
+Key Functions:
+send_command(command)
+– Sends commands to the Alicat device.
+change_setpoint(unit_id, setpoint_value)
+– Sets a new flowrate or pressure setpoint.
+poll_device_data(unit_id)
+– Retrieves current measurements from the device.
+close()
+– Closes the serial connection.
+pressure_controller.py – Pressure Controller
+Purpose:
+Interfaces with the MKS Baratron pressure sensor using
+nidaqmx
+.
+Reads and converts voltage data to pressure values.
+Key Functions:
+read_pressure()
+– Reads pressure data and converts it to Torr.
+close()
+– Closes the
+nidaqmx
+task.
+temp_controller.py – Temperature Controller
+Purpose:
+Manages heaters and thermocouples in the reactor.
+Supports dynamic duty cycles and autoset functionality for Heater 1.
+Key Functions:
+create_heater_tasks()
+– Initializes
+nidaqmx
+tasks for heaters.
+create_thermocouple_tasks()
+– Configures
+nidaqmx
+tasks for thermocouples.
+start_threads()
+– Starts threads for heater duty cycles.
+autoset_duty_cycle()
+– Dynamically adjusts Heater 1's duty cycle based on temperature.
+close()
+– Safely stops threads and closes all tasks.
+valve_controller.py – Valve Controller
+Purpose:
+Manages the operation of valves in the reactor.
+Provides methods to open, close, pulse, and close all valves.
+Key Functions:
+create_valve_tasks()
+– Initializes
+nidaqmx
+tasks for valves.
+open_valve(task)
+– Opens a specific valve.
+close_valve(task)
+– Closes a specific valve.
+pulse_valve(indices, pulse_length)
+– Temporarily opens valves for a specified duration.
+close_all()
+– Closes all valves.
+close()
+– Releases all
+nidaqmx
+resources.
+GUI Panels
+ald_panel.py – ALD Panel
+Purpose:
+Provides controls for starting, pausing, and monitoring ALD runs.
+Key Functions:
+create_ald_panel(parent)
+– Creates the panel with input fields, buttons, and a progress bar.
+start_run()
+– Prepares the run by validating input and calculating runtime.
+confirm_run(loops)
+– Starts the ALD run and disables other controls.
+update_progress_bar()
+– Tracks and displays run progress.
+main_power.py – Main Power Control
+Purpose:
+Manages the main power relay for the reactor.
+Key Functions:
+create_main_power_task()
+– Initializes the
+nidaqmx
+task for the power relay.
+toggle_main_power()
+– Toggles the power state (ON/OFF).
+close()
+– Ensures the relay is turned off and the task is closed.
+manual_control_panel.py – Manual Control Panel
+Purpose:
+Allows users to load recipe files and manually control valves.
+Key Functions:
+load_file()
+– Loads a recipe file and updates the
+ald_controller
+.
+open_manual_control()
+– Opens a sub-panel for manual valve operations.
+heater_control_panel.py – Heater Control Panel
+Purpose:
+Provides controls for managing heater duty cycles, maximum temperature settings, and gas flowrates.
+Interfaces with the
+temp_controller
+for heater operations and the Alicat MFC for flowrate adjustments.
+Key Functions:
+create_heater_control_panel()
+– Creates entry fields and buttons for heater and flowrate controls.
+set_duty_value(i, duty_cycle_var)
+– Updates the duty cycle for a specific heater.
+set_max_temp(i, max_temp_var)
+– Sets the maximum temperature limit for a specific heater.
+change_setpt(setpt_var)
+– Updates the Alicat MFC flowrate setpoint.
+change_autoset(autoset_temp_var)
+– Enables or disables autoset functionality for Heater 1.
+plot_panel.py – Plot Panel
+Purpose:
+Provides real-time monitoring of pressure and temperature data using
+matplotlib
+.
+Integrates with the
+log_controller
+to retrieve and display data dynamically.
+Key Functions:
+plot_initialize()
+– Sets up the plot with default settings.
+animate(i)
+– Updates the plot with real-time data from pressure and temperature sensors.
+toggle_show_temperatures()
+– Toggles the visibility of temperature data on the plot.
+close()
+– Ensures proper cleanup of
+matplotlib
+resources.
+log_controller.py – Log Controller
+Purpose:
+Manages data logging, real-time monitoring, and safety mechanisms for the reactor.
+Monitors temperature thresholds to prevent overheating and triggers safety measures when necessary.
+Key Functions:
+record_data()
+– Collects sensor data and logs it to the main and monitor log files.
+update_max_temp(i, max_temp)
+– Updates the maximum temperature threshold for a specific sensor.
+kill_run()
+– Pauses the ALD run and disables main power during overheating events.
+close()
+– Safely stops the logging thread and releases resources.
+Sources:
+Python Libraries:
+
+tkinter
+– Used for building the graphical user interface.
+matplotlib
+– Used for real-time plotting of pressure and temperature data.
+nidaqmx
+– Used for interfacing with NI DAQ hardware for sensor and actuator control.
+serial
+– Used for communicating with the Alicat Mass Flow Controller.
+logging
+– Used for logging events and data for monitoring and debugging.
