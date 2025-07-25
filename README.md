@@ -94,7 +94,7 @@ The control application consists of the following components:
 
 ---
 
-### `config.py` - Configuration File
+## `config.py` - Configuration File
 
 This config defines the constants and configuration settings used throughout the ALD reactor control program. These constants include visual style for the GUI, log file paths, hardware channels, and operational parameters for the system's components.
 
