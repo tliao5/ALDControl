@@ -9,7 +9,7 @@ class LogController:
     def __init__(self,app):
         self.app = app
     
-        self.max_temperatures = [100]*4
+        self.max_temperatures = [300]*4
         self.controllers_active_flag = True
 
         self.t_array = deque([], maxlen=200)
@@ -32,6 +32,14 @@ class LogController:
             pressuredata = self.app.pressure_controller.read_pressure()
             record = create_record(str(tempdata + [pressuredata]), LOG_FILE)
             self.app.logger.handle(record)
+            
+            try:
+                while True:
+                    self.app.temp_controller.current_temp_queue.get_nowait()
+            except:
+                pass
+            self.app.temp_controller.current_temp_queue.put(tempdata[0])
+            
             while not self.monitor_queue.empty():
                 self.app.monitor_logger.handle(self.monitor_queue.get(block=False))
             
@@ -58,6 +66,8 @@ class LogController:
                     record = create_record(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
                     self.kill_run()
+                    
+            
 
             temperature_deque.append(tempdata)
             pressure_deque.append(round(pressuredata, 5))
@@ -80,10 +90,8 @@ class LogController:
         
 
     def close(self):
-        print(self.stopthread.is_set())
         print("Logging Thread Closing")
         self.stopthread.set()
-        print(self.stopthread.is_set())
         self.logging_thread.join()
         print("Logging Thread Closed")
 

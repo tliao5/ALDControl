@@ -55,7 +55,7 @@ class ALDController:
                 #print(f"Row: {row}, Indices: {indices}, PrevIndices: {previndices}")
                 indices = [index for index in indices if index not in previndices] # This checks if the previous line in the recipe file indicates a valce should be held open instead of pulsed
                 if indices:
-                    valve_names = " ".join([f"AV0{i}" for i in indices])
+                    valve_names = " ".join([f"AV0{i+1}" for i in indices])
                     record = log_controller.create_record(f"{valve_names}, {dataNP[j][6]}",MONITOR_LOG_FILE)
                     monitor_queue.put(record)
                     vc.pulse_valve(indices,dataNP[j][6])
