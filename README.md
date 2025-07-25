@@ -14,19 +14,20 @@ Hardware Integration
 ## Software Components
 The control application consists of the following components:
 ```
-    app.py – The main program loop, initializes all controllers and GUI panels  
-    ╚ controller ================== Controls different aspects of the reactor using nidaqmx functionality  
-       └ ald_controller -----------– ALD run cycle logic, creates new thread at run start  
-       └ mfc_reader ---------------– Alicat flow control interface  
-       └ pressure_controller ------– Pressure reading from MKS Baratron  
-       └ temp_controller ----------– Temperature reading from thermocouples, creates threads to control heaters  
-       └ valve_controller ---------– Logic to open, close, and pulse valves  
-    ╚ gui_panel =================== Allows the user to interface with the controllers   
-       └ main_power ---------------- Button that turns on and off the main power relay  
-       └ ald_panel ----------------- Run start controls  
-       └ manual_control_panel -----– Manual ALD valve control and file loading  
-       └ heater_control_panel -----– Heater and mass flow control  
-       └ plot_panel ---------------- Real-time display of pressures and temperatures  
+    **app.py** – The main program loop, initializes all controllers and GUI panels
+    **config.py** - System configuration and visual style 
+    ╚ **controllers** ================== Controls different aspects of the reactor using nidaqmx functionality  
+       └ *ald_controller* -----------– ALD run cycle logic, creates new thread at run start  
+       └ *mfc_reader* ---------------– Alicat flow control interface  
+       └ *pressure_controller* ------– Pressure reading from MKS Baratron  
+       └ *temp_controller* ----------– Temperature reading from thermocouples, creates threads to control heaters  
+       └ *valve_controller* ---------– Logic to open, close, and pulse valves  
+    ╚ **gui_panel** =================== Allows the user to interface with the controllers   
+       └ *main_power* ---------------- Button that turns on and off the main power relay  
+       └ *ald_panel* ----------------- Run start controls  
+       └ *manual_control_panel* -----– Manual ALD valve control and file loading  
+       └ *heater_control_panel* -----– Heater and mass flow control  
+       └ *plot_panel* ---------------- Real-time display of pressures and temperatures  
 ```
 
 # How to Start a Run
