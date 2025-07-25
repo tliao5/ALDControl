@@ -1,20 +1,19 @@
-#ALDControl
+# ALDControl
 ALD Control System Overview
-The ALD Control software manages various aspects of the ALD Reactor, including temperature, pressure, valve operations, and carrier gas flow. It integrates hardware control via NI DAQ and Alicat Mass Flow Controller, and provides a user-friendly graphical interface built with Python's
-tkinter
-package.
-
+The ALD Control software manages various aspects of the ALD Reactor, including temperature, pressure, valve operations, and carrier gas flow. It integrates hardware control via NI DAQ and Alicat Mass Flow Controller, and provides a user-friendly graphical interface built with Python's tkinter package.
+```
 Hardware Integration
-╚ Via NI DAQ
-└ Thermocouples – Temperature Reading
-└ MKS Baratron – Pressure Reading
-└ Band Heaters – System Temperature Control
-└ Swagelok ALD Valves – Run Cycle Control
-╚ Alicat Mass Flow Controller – Carrier Gas Flow
+    ╚ Via NI DAQ
+    └ Thermocouples – Temperature Reading
+    └ MKS Baratron – Pressure Reading
+    └ Band Heaters – System Temperature Control
+    └ Swagelok ALD Valves – Run Cycle Control
+    ╚ Alicat Mass Flow Controller – Carrier Gas Flow
+```
 
 Software Components
 The control application consists of the following components:
-
+```
     app.py – The main program loop, initializes all controllers and GUI panels  
     ╚ controller ================== Controls different aspects of the reactor using nidaqmx functionality  
        └ ald_controller -----------– ALD run cycle logic, creates new thread at run start  
@@ -28,69 +27,51 @@ The control application consists of the following components:
        └ manual_control_panel -----– Manual ALD valve control and file loading  
        └ heater_control_panel -----– Heater and mass flow control  
        └ plot_panel ---------------- Real-time display of pressures and temperatures  
-How to Start a Run
-Double-check the
-config.py
-file to ensure log file paths and other settings are correct.
-Run
-app.py
-in the command line.
-Press the "Main Power" button at the top to enable heater and valve controls.
-Set duty values for each heater to heat up the system.
-Press the "Load File" button and select the recipe file.
-Review the recipe file displayed in the GUI.
-Enter the number of cycles into the "Loops" field.
-Press "Confirm" to begin the ALD run.
+```
+
+# How to Start a Run
+1. Double-check the config.py file to ensure log file paths and other settings are correct.
+2. Run app.py in the command line.
+3. Press the "Main Power" button at the top to enable heater and valve controls.
+4. Set duty values for each heater to heat up the system.
+5. Set appropriate max temperatures for each component
+6. Wait until desired temperatures are reached (Use Show Temperatures button to display temperature curves)
+7. Press the "Load File" button and select the recipe file.
+8. Review the recipe file displayed in the GUI.
+9. Enter the number of cycles into the "Loops" field.
+10. Press "Confirm" to begin the ALD run.
 Notes
-Logging:
+Logging/Plotting:
+    Logging occurs every 0.5s when the log_controller gathers data and log records from various parts of the program
+    The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
 
-Logging occurs at each update call of the
-animate()
-function in
-plot_panel
-.
-The main plot shows Pressure vs. Samples, not Pressure vs. Time.
 Timers:
+    Two timers are active during a run: the main thread's elapsed time and the aldRun thread's elapsed time. These are synchronized manually but may be updated in the future.
 
-Two timers are active during a run: the main thread's elapsed time and the
-aldRun
-thread's elapsed time. These are synchronized but may be updated in the future.
 Threads:
-
-app.py
-runs in the main thread.
-Additional threads include:
-aldRun
-– ALD run thread
-h1dutycycle
-,
-h2dutycycle
-,
-h3dutycycle
-– Heater duty cycle threads
-Tkinter
-.after()
-Events:
-
-ald_panel.update_progress_bar()
-– Updates every ~900ms to control the run timer in the main thread.
-heater_control_panel.update_setpoint_reading()
-– Updates every ~1000ms to read flowrate setpoints.
+    app.py is the main thread
+    Additional threads include:
+        – ALD run thread (ald_controller)
+        – Heater duty cycle threads (temp_controller)
+        - Logging thread (log_controller)
+    Thread communicate mostly via python queue.Queue() objects
+    
+Tkinter .after() Events:
+    ald_panel.update_progress_bar()
+        – Updates every ~900ms to control the run timer in the main thread.
+        
 Shutdown:
+    All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
 
-All threads and tasks should close automatically when the program is terminated, but this may take some time.
-Planned Features
-Automatic temperature adjustment for fine-tuning duty cycle control.
-Pause Run feature to allow adjustments mid-run.
-Performance improvements to enhance display smoothness and reduce latency.
-Function and Class Overview
-app.py – Main Program
+Planned Features:
+    Performance improvements to enhance display smoothness and reduce latency.
+    De-spaghettification of various controllers
+# Function and Class Overview
+    app.py – Main Program
 Purpose:
-Runs the main program loop.
-Sets up logging using Python's
-logging
-module.
-Initializes all controllers and GUI panels.
+    Runs the main program loop.
+    Sets up logging using Python's logging module.
+    Initializes all controllers and GUI panels.
 Structure:
 outer_frame
 – Main container for the GUI.
