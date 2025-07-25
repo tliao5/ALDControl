@@ -19,7 +19,7 @@ class MainPower:
 
     def create_main_power_button(self, parent):
         self.main_power_button = tk.Button(
-            parent, text='Main Power OFF', fg=BUTTON_TEXT_COLOR, bg=OFF_COLOR, relief=BUTTON_STYLE,
+            parent, text='Main Power OFF', fg=BUTTON_TEXT_COLOR, bg=OFF_COLOR, relief=BUTTON_STYLE, font=FONT,
             command=self.toggle_main_power
         )
         self.main_power_button.pack(pady=10)

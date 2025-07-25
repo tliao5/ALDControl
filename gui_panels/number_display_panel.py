@@ -103,7 +103,7 @@ class NumberDisplayPanel:
     
     def change_autoset(self, autoset_temp_var):
         #try:
-        self.autoset_temp = int(autoset_temp_var.get())
+        self.autoset_temp = float(autoset_temp_var.get())
         duty = self.duty[0]
         if self.autoset_button["bg"] == ON_COLOR or self.autoset_temp == 0:
             print("Autoset Disabled")
