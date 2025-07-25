@@ -10,7 +10,7 @@ FONT = ("Helvetica", 22)
 
 
 # Log output
-LOG_FILE = "HorizontalChamberJuly.log"
+LOG_FILE = "PressureTempJuly.log"
 MONITOR_LOG_FILE = "monitor.log"
 
 # Pressure plot default y min and max
@@ -29,7 +29,7 @@ HEATER_CHANNELS = { "h1channel": "CDAQ1Mod4/port0/line5", # heater 1
                     "h2channel": "CDAQ1Mod4/port0/line6", # heater 2
                     "h3channel": "CDAQ1Mod4/port0/line7", # heater 3
                     "h4channel": "CDAQ1Mod4/port0/line8"} # heater 4
-TEMP_CHANNELS = ["ai0", "ai1", "ai2", "ai3", "ai4", "ai5", "ai6","ai7", "ai10", "ai13", "ai9", "ai14"]
+TEMP_CHANNELS = ["ai0", "ai1", "ai2", "ai3", "ai4", "ai5", "ai6"]
 DUTY_CYCLE_LENGTH = 10 # seconds
 
 PRESSURE_CHANNEL = {"Pchannel":"cDAQ1Mod2/ai2"}
