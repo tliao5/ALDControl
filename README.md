@@ -11,7 +11,7 @@ Hardware Integration
     ╚ Alicat Mass Flow Controller – Carrier Gas Flow
 ```
 
-Software Components
+## Software Components
 The control application consists of the following components:
 ```
     app.py – The main program loop, initializes all controllers and GUI panels  
