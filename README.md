@@ -247,9 +247,7 @@ The control application consists of the following components:
 
 ---
 
-## Sources
-
-### **Python Libraries**  
+## **Python Libraries**  
 - **`tkinter`** – Used for building the graphical user interface.  
 - **`matplotlib`** – Used for real-time plotting of pressure and temperature data.  
 - **`nidaqmx`** – Used for interfacing with NI DAQ hardware for sensor and actuator control.  
