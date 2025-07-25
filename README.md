@@ -56,12 +56,12 @@ config.py - System configuration and visual style
 - Two timers are active during a run: the main thread's elapsed time and the aldRun thread's elapsed time. These are synchronized manually but may be updated in the future.
 
 ## Threads:
-- app.py is the main thread
+- `app.py` is the main thread
 - Additional threads include:
     - ALD run thread (ald_controller)
     - Heater duty cycle threads (temp_controller)
     - Logging thread (log_controller)
-- Thread communicate mostly via python queue.Queue() objects
+- Thread communicate mostly via python `queue.Queue()` objects
 - All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
     
 ## Tkinter .after() Events:
