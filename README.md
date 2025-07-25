@@ -71,10 +71,21 @@ config.py - System configuration and visual style
 ## Planned Features:
 - Performance improvements to enhance display smoothness and reduce latency
 - "De-spaghettification" of various controllers for an easier modification process
-    
-# Function and Class Overview
+
 ---
 
+# Python Libraries  
+- `tkinter` – Used for building the graphical user interface.  
+- `matplotlib` – Used for real-time plotting of pressure and temperature data.  
+- `nidaqmx` – Used for interfacing with NI DAQ hardware for sensor and actuator control.  
+- `serial` – Used for communicating with the Alicat Mass Flow Controller.  
+- `logging` – Used for logging events and data for monitoring and debugging.
+- `queue` - Used for managing thread communication
+- `collections.deque` - Used to store temperature and pressure data in a threadsafe manner
+---
+
+# Function and Class Overview
+---
 ## `app.py` – Main Program
 
 ### Purpose  
@@ -273,16 +284,3 @@ This config defines the constants and configuration settings used throughout the
 - `update_max_temp(i, max_temp)` – Updates the maximum temperature threshold for a specific sensor.  
 - `kill_run()` – Pauses the ALD run and disables main power during overheating events.  
 - `close()` – Safely stops the logging thread and releases resources.  
-
----
-
-# Python Libraries  
-- `tkinter` – Used for building the graphical user interface.  
-- `matplotlib` – Used for real-time plotting of pressure and temperature data.  
-- `nidaqmx` – Used for interfacing with NI DAQ hardware for sensor and actuator control.  
-- `serial` – Used for communicating with the Alicat Mass Flow Controller.  
-- `logging` – Used for logging events and data for monitoring and debugging.
-- `queue` - Used for managing thread communication
-- `collections.deque` - Used to store temperature and pressure data in a threadsafe manner
-
----
