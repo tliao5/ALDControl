@@ -30,6 +30,7 @@ The control application consists of the following components:
 ```
 
 # How to Start a Run
+```
 1. Double-check the config.py file to ensure log file paths and other settings are correct.
 2. Run app.py in the command line.
 3. Press the "Main Power" button at the top to enable heater and valve controls.
@@ -40,8 +41,10 @@ The control application consists of the following components:
 8. Review the recipe file displayed in the GUI.
 9. Enter the number of cycles into the "Loops" field.
 10. Press "Confirm" to begin the ALD run.
-Notes
+```
+# Notes
 Logging/Plotting:
+    
     Logging occurs every 0.5s when the log_controller gathers data and log records from various parts of the program
     The main plot shows Pressure vs. Samples, not quite Pressure vs. Time
 
