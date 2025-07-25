@@ -72,7 +72,7 @@ class PlotPanel:
             if self.show_temperatures == True:
                 self.ax_right.set_visible(True) 
                 self.ax_right.set_ylim(0,300)
-                for i in range(11):
+                for i in range(len(THERMOCOUPLE_CHANNELS):
                     self.ax_right.plot(self.t_array, [row[i] for row in self.app.log_controller.temperature_deque],THERMOCOUPLE_COLORS[i])
             else:
                 self.ax_right.set_visible(False) 
