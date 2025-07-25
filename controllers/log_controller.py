@@ -5,47 +5,59 @@ import time
 import threading
 from config import LOG_FILE, MONITOR_LOG_FILE
 
+## Log Controller
+# Gathers data from sensors
+# Sends data to plot_panel
+# Manages temperature watchdog and autoset functions
+# Interfaces with temp_controller to do so
+
 class LogController:
     def __init__(self,app):
         self.app = app
     
-        self.max_temperatures = [300]*4
-        self.controllers_active_flag = True
-
-        self.t_array = deque([], maxlen=200)
-        self.pressure_deque = deque([],maxlen=200)
-        self.temperature_deque = deque([],maxlen=200)
-        self.stopthread = threading.Event()
-        self.t_start = time.time()
+        self.max_temperatures = [300]*4 # default max temperature, will cause problems if this is below the starting system temp
+        self.controllers_active_flag = True # this flag is set to False when an overheat is detected, must be reset by main_power
+                                            # otherwise the log thread would spam messages until the overheat was resolved
+        # declaring data deques
+        self.t_array = deque([], maxlen=200) # time array
+        self.pressure_deque = deque([],maxlen=200) # pressure data
+        self.temperature_deque = deque([],maxlen=200) # thermocouple data
+        self.stopthread = threading.Event() # stopthread for logging thread 
+        self.t_start = time.time() # time of initialization
         
-        self.log_queue = queue.Queue()     
-        self.monitor_queue = queue.Queue() 
+        self.log_queue = queue.Queue() # holds log records waiting to be processed from threads
+        self.monitor_queue = queue.Queue()  # holds monitor log records '''
+        
+        # this function can probably be edited so the arguments are not so wordy, but it works for now
         self.logging_thread = threading.Thread(target=self.record_data, args=(self.stopthread,self.log_queue,self.t_array, self.t_start, self.pressure_deque, self.temperature_deque))
-
         self.logging_thread.start()
 
+    # this thread gathers all data and puts the log records into their files
     def record_data(self, stopthread, log_queue, t_array,  t_start, pressure_deque,temperature_deque):
         while not stopthread.is_set():
-            measurement_start_time = time.perf_counter()
+            measurement_start_time = time.perf_counter() # performance timer to make sure each log entry at standard timing every 0.5 seconds
             
-            tempdata = self.app.temp_controller.read_thermocouples()
-            pressuredata = self.app.pressure_controller.read_pressure()
-            record = create_record(str(tempdata + [pressuredata]), LOG_FILE)
-            self.app.logger.handle(record)
+            tempdata = self.app.temp_controller.read_thermocouples() # get temperature data
+            pressuredata = self.app.pressure_controller.read_pressure() # get pressure data
+            record = create_record(str(tempdata + [pressuredata]), LOG_FILE) 
+            self.app.logger.handle(record) # log to main log file
             
+            # send main reactor temp to Heater 1 thread for autoset
             try:
                 while True:
-                    self.app.temp_controller.current_temp_queue.get_nowait()
+                    self.app.temp_controller.current_temp_queue.get_nowait() # clear temperature queue
             except:
                 pass
-            self.app.temp_controller.current_temp_queue.put(tempdata[0])
+            self.app.temp_controller.current_temp_queue.put(tempdata[0]) # put most recent temperature value on the queue
             
+            # update monitor log file
             while not self.monitor_queue.empty():
                 self.app.monitor_logger.handle(self.monitor_queue.get(block=False))
             
             # Kill ald run, close valves, -- flow controller will continue to be on, and logging/plotting will continue 
-            #print(self.controllers_active_flag
-            if self.controllers_active_flag == True:
+            if self.controllers_active_flag == True: # only check for overheat if main power is enabled/re-enabled
+                
+                ''' key: ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges"] '''
                 if tempdata[0] > self.max_temperatures[0]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}")
                     record = create_record(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}", MONITOR_LOG_FILE)
@@ -68,7 +80,7 @@ class LogController:
                     self.kill_run()
                     
             
-
+            # send data to plot_panel
             temperature_deque.append(tempdata)
             pressure_deque.append(round(pressuredata, 5))
             t_array.append(time.time() - t_start)
@@ -77,18 +89,21 @@ class LogController:
             duration = measurement_end_time-measurement_start_time
             if 0.5-duration > 0:
                 time.sleep(0.5-duration)
+                # wait until 0.5 seconds is up before logging again
         print("Logging Thread Stopped")
 
+    # called by heater_control_panel to set a new max temp value for comparison
     def update_max_temp(self, i, max_temp):
         self.max_temperatures[i] = max_temp
 
+    # pauses ALD run and turns off main power
     def kill_run(self):
         self.app.main_power.main_power_off()
         if hasattr(self.app.ald_controller, 'aldRunThread') and self.app.ald_controller.aldRunThread is not None:
             self.app.ald_panel.pause_run()
         self.controllers_active_flag = False
         
-
+    # cleanup
     def close(self):
         print("Logging Thread Closing")
         self.stopthread.set()

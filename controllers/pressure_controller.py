@@ -6,6 +6,11 @@ import time
 import threading
 from config import PRESSURE_CHANNEL
 
+## Pressure Controller
+# More of a pressure reader
+# Sets up nidaqmx to read the MKS Baratron
+# read_pressure called by log_controller
+
 class PressureController:
     def __init__(self):
         print("Pressure Controller Initializing")

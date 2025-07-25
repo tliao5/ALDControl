@@ -4,10 +4,10 @@ import time
 import threading
 from config import VALVE_CHANNELS
 
-# creating a valve_controller object will setup all relevant channels
-# access said object in order to run methods on the valves connected to channels defined below
+## Valve Controler
+# Create nidaqmx channels for each valve based on VALVE_CHANNELS
+# Open / Close / Pulse / Close_All different valve functions
 
-# currently hard coded for the three valves of this ALD system
 class ValveController:
     def __init__(self):
         print("Valve Controller Initialized")
@@ -23,43 +23,37 @@ class ValveController:
             valves[i].start()
         return valves
 
-        
     def open_valve(self,task):
         task.write(True)
         time.sleep(0.1)
-        #log valve opened
+        #log valve opened?
         
     def close_valve(self,task):
         task.write(False)
         time.sleep(0.1)
-        #log valve closed
+        #log valve closed?
 
+#### This pulse valve function can theoretically allow multiple valve to be pulsed simultaneously
+##      doing so seems to cause significant latency, but for now it performs the simple function good enough
     def pulse_valve(self,indices,pulse_length):
-        
-        #print(indices[::])
         tasks = [self.tasks[i] for i in indices]
-        #print(tasks)
         for t in tasks[::]:
-            #print(t.name)
             t.write(True)
             measurement_start_time = time.perf_counter()
         time.sleep(pulse_length)
         for t in tasks[::]:
-            #print(t.name)
             t.write(False)
             measurement_end_time = time.perf_counter()
-            #print(measurement_end_time-measurement_start_time)
-        
-        
-        #print(f"Task {task.name}: False")
-        #log valve pulsed
+        #log valve pulsed?
 
+    # simple function to close all valves at once
     def close_all(self):
         for task in self.tasks[::]:
             #print(task)
             task.write(False)
             time.sleep(0.1)
 
+    # cleanup
     def close(self):
         self.close_all()
         for task in self.tasks[::]: task.close()
