@@ -1,5 +1,5 @@
 # ALDControl
-ALD Control System Overview
+## ALD Control System Overview
 The ALD Control software manages various aspects of the ALD Reactor, including temperature, pressure, valve operations, and carrier gas flow. It integrates hardware control via NI DAQ and Alicat Mass Flow Controller, and provides a user-friendly graphical interface built with Python's tkinter package.
 ```
 Hardware Integration
@@ -76,32 +76,21 @@ Planned Features:
     - "De-spaghettification" of various controllers for an easier modification process
     
 # Function and Class Overview
-    app.py – Main Program
-Purpose:
-
+## app.py – Main Program
+### Purpose:
     Runs the main program loop.
     Sets up logging using Python's logging module.
-    Initializes all controllers and GUI panels.
-    
-Structure:  
-outer_frame
-
-– Main container for the GUI.
-tk.PanedWindow()
-– Allows dynamic resizing of GUI panels.
+    Initializes all controllers and GUI panels.   
+### Structure:  
+outer_frame – Main container for the GUI.
+tk.PanedWindow() – Allows dynamic resizing of GUI panels.
 Panels:
-top_pane
-– Contains the main power button.
-main_pane
-– Center content window.
-horizontal_pane
-– Divides the center content window into left and right sections.
-bottom_pane
-– Contains the manual control panel and ALD run control panel.
+    top_pane– Contains the main power button.
+    main_pane – Center content window.
+    horizontal_pane – Divides the center content window into left and right sections.
+    bottom_pane – Contains the manual control panel and ALD run control panel.
 Closing Logic:
-Calls the
-close()
-function for each component to ensure all NI DAQ tasks and threads are properly terminated.
+    Calls the close() function for each component to ensure all NI DAQ tasks and threads are properly terminated.
 Controllers
 ald_controller.py – ALD Recipe Controller
 Purpose:
