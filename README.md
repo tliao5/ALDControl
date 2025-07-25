@@ -31,8 +31,8 @@ The control application consists of the following components:
 
 # How to Start a Run
 
-1. Double-check the config.py file to ensure log file paths and other settings are correct.
-2. Run app.py in the command line.
+1. Double-check the `config.py` file to ensure log file paths and other settings are correct.
+2. Run `app.py` in the command line.
 3. Press the "Main Power" button at the top to enable heater and valve controls.
 4. Set duty values for each heater to heat up the system.
 5. Set appropriate max temperatures for each component
