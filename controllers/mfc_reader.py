@@ -1,6 +1,12 @@
 import serial
 import time
  
+## Alicat Controller
+# from Rashad
+# We use it to open the serial connection
+# And to send updated flowrate setpoint
+# Sometimes the COM port may change based on the device, this can be set in the config file
+
 class AlicatController:
     def __init__(self, port, baudrate=19200, timeout=0.2):
         """
@@ -78,7 +84,7 @@ class AlicatController:
         if self.ser.is_open:
             self.ser.close()
             
- 
+# for testing
 if __name__ == "__main__":
     alicat = AlicatController(port="COM6")
     #alicat.send_command("@B")

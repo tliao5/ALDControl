@@ -8,6 +8,11 @@ import queue
 
 from config import MONITOR_LOG_FILE
 
+## ALD Controller
+# Creates new thread to run recipe
+# Pauses if signalled to by ald_panel
+# Interfaces with valve_controller to do the actual opening/closing/pulsing of valves
+
 class ALDController:
     def __init__(self, app):
         print("ALD Recipe Controller Initializing")
@@ -46,36 +51,40 @@ class ALDController:
                     break
 
             #print(f"Cycle: {i+1}/{loops}")
-            for j in range(0,len(dataNP),1):#For each row in the .csv file, we want to set the experimental parameters accordingly
+
+#### The following logic is a little overcomplicated, but theoretically enables a valve to be held open / multiple valves pulsed at once ####
+##      It does do the simple task of pulsing the valves based on run recipe, but the other features have not been tested
+            
+            for j in range(0,len(dataNP),1):# for each row in the .csv file, we want to set the experimental parameters accordingly
                 #print(f"Row: {j+1}")
                 if self.stopthread.is_set():
                     break
                 row = dataNP[j][:-1].tolist()
                 indices = [index for index, val in enumerate(row) if val == 1] # find the indices of each "1" in the line, indicating valve should be opened
-                #print(f"Row: {row}, Indices: {indices}, PrevIndices: {previndices}")
-                indices = [index for index in indices if index not in previndices] # This checks if the previous line in the recipe file indicates a valce should be held open instead of pulsed
-                if indices:
+                indices = [index for index in indices if index not in previndices] # this checks if the previous line in the recipe file indicates a valve should be held open instead of pulsed
+                
+                if indices: # send a log entry to the monitor log file saying which valve has been triggered
                     valve_names = " ".join([f"AV0{i+1}" for i in indices])
                     record = log_controller.create_record(f"{valve_names}, {dataNP[j][6]}",MONITOR_LOG_FILE)
                     monitor_queue.put(record)
                     vc.pulse_valve(indices,dataNP[j][6])
-                else:
+                else: # if there are no valves being pulsed, assume the system is purging and send a log entry
                     record = log_controller.create_record(f"Purge, {dataNP[j][6]}",MONITOR_LOG_FILE)
                     monitor_queue.put(record)
                     time.sleep(dataNP[j][6])
                 previndices = indices
-                elapsed_time = elapsed_time+dataNP[j][6]
+                elapsed_time = elapsed_time+dataNP[j][6] # update elapsed time for progress tracking in ald_panel
                 queue.put(elapsed_time)
                 #print()
         print("Run Over")
-        record = log_controller.create_record("ALD Run Finished", MONITOR_LOG_FILE)
+        record = log_controller.create_record(f"ALD Run Finished - {loops} Cycles", MONITOR_LOG_FILE)
         monitor_queue.put(record)
-        vc.close_all() # make sure all valves are shut off at the end of a run
+        vc.close_all() # extra safety check that all ald valves are shut at the end of a run
 
     def close(self):
         self.stopthread.set()
         # Check if the thread exists and is initialized
         if hasattr(self, 'aldRunThread') and self.aldRunThread is not None:
             print("Waiting for ALD Run Thread to Close")
-            self.aldRunThread.join()
+            self.aldRunThread.join() # call thread to close
         print("ALD Recipe Controller Closing")
