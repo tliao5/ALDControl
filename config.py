@@ -30,7 +30,7 @@ HEATER_CHANNELS = { "h1channel": "CDAQ1Mod4/port0/line5", # heater 1
                     "h3channel": "CDAQ1Mod4/port0/line7", # heater 3
                     "h4channel": "CDAQ1Mod4/port0/line8"} # heater 4
 TEMP_CHANNELS = ["ai0", "ai1", "ai2", "ai3", "ai4", "ai5", "ai6"]
-SENSOR_NAMES = ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges","1","4","5","7","9","Pressure"]
+SENSOR_NAMES = ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges","Pressure"]
 DUTY_CYCLE_LENGTH = 10 # seconds
 
 PRESSURE_CHANNEL = {"Pchannel":"cDAQ1Mod2/ai2"}
