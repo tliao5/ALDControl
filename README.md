@@ -61,7 +61,7 @@ config.py - System configuration and visual style
     - ALD run thread (ald_controller)
     - Heater duty cycle threads (temp_controller)
     - Logging thread (log_controller)
-- Thread communicate mostly via python `queue.Queue()` objects
+- Threads communicate mostly via python `queue.Queue()` objects
 - All threads and tasks should close automatically when the program is terminated, but this may take some time. Often the window will show "Not Responding" while waiting for a particular thread to close
     
 ## Tkinter .after() Events:
