@@ -150,7 +150,7 @@ This config defines the constants and configuration settings used throughout the
 
 ---
 
-### `alicat_controller.py` – Alicat Mass Flow Controller (MFC) Interface
+### `mfc_reader.py` – Alicat Mass Flow Controller (MFC) Interface
 
 #### Purpose  
 - Provides an interface for communicating with the Alicat MFC via serial communication.  
