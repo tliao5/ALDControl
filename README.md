@@ -70,7 +70,7 @@ config.py - System configuration and visual style
 
 ## Planned Features:
 - Performance improvements to enhance display smoothness and reduce latency
-- "De-spaghettification" of various controllers for an easier modification process
+- "De-spaghettification" of various controllers for easier software modification in the future
 
 ---
 
