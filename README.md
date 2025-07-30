@@ -82,10 +82,11 @@ config.py - System configuration and visual style
 - `logging` – Used for logging events and data for monitoring and debugging.
 - `queue` - Used for managing thread communication
 - `collections.deque` - Used to store temperature and pressure data in a threadsafe manner
+
 ---
 
 # Function and Class Overview
----
+
 ## `app.py` – Main Program
 
 ### Purpose  
@@ -106,7 +107,7 @@ config.py - System configuration and visual style
 ### Closing Logic  
 - Calls the `close()` function for each component to ensure all NI DAQ tasks and threads are properly terminated.  
 
----
+
 
 ## `config.py` - Configuration File
 
