@@ -113,7 +113,7 @@ config.py - System configuration and visual style
 
 This config defines the constants and configuration settings used throughout the ALD reactor control program. These constants include visual style for the GUI, log file paths, hardware channels, and operational parameters for the system's components.
 
-### Key Features
+### Features
 
 #### GUI Styling
 - Defines colors, fonts, and button styles for the graphical user interface.
@@ -143,7 +143,7 @@ This config defines the constants and configuration settings used throughout the
 - Interfaces with the `valve_controller` to control valve operations.  
 - Communicates with the `ald_panel` for pausing and progress tracking.  
 
-#### Key Functions  
+####  Functions  
 - `create_run_thread(loops, vc)` – Starts a new thread to execute the ALD recipe.  
 - `aldRun(loops, vc, queue)` – Executes the recipe by pulsing valves based on the recipe file. Handles multiple loops and complex valve operations. Updates elapsed time for progress tracking.  
 - `close()` – Safely stops the thread and ensures all valves are closed.  
@@ -156,7 +156,7 @@ This config defines the constants and configuration settings used throughout the
 - Provides an interface for communicating with the Alicat MFC via serial communication.  
 - Manages gas flowrate and pressure settings.  
 
-#### Key Functions  
+####  Functions  
 - `send_command(command)` – Sends commands to the Alicat device.  
 - `change_setpoint(unit_id, setpoint_value)` – Sets a new flowrate or pressure setpoint.  
 - `poll_device_data(unit_id)` – Retrieves current measurements from the device.  
@@ -170,7 +170,7 @@ This config defines the constants and configuration settings used throughout the
 - Interfaces with the MKS Baratron pressure sensor using `nidaqmx`.  
 - Reads and converts voltage data to pressure values.  
 
-#### Key Functions  
+####  Functions  
 - `read_pressure()` – Reads pressure data and converts it to Torr.  
 - `close()` – Closes the `nidaqmx` task.  
 
@@ -182,7 +182,7 @@ This config defines the constants and configuration settings used throughout the
 - Manages heaters and thermocouples in the reactor.  
 - Supports dynamic duty cycles and autoset functionality for Heater 1.  
 
-#### Key Functions  
+####  Functions  
 - `create_heater_tasks()` – Initializes `nidaqmx` tasks for heaters.  
 - `create_thermocouple_tasks()` – Configures `nidaqmx` tasks for thermocouples.  
 - `start_threads()` – Starts threads for heater duty cycles.  
@@ -197,7 +197,7 @@ This config defines the constants and configuration settings used throughout the
 - Manages the operation of valves in the reactor.  
 - Provides methods to open, close, pulse, and close all valves.  
 
-#### Key Functions  
+####  Functions  
 - `create_valve_tasks()` – Initializes `nidaqmx` tasks for valves.  
 - `open_valve(task)` – Opens a specific valve.  
 - `close_valve(task)` – Closes a specific valve.  
@@ -214,7 +214,7 @@ This config defines the constants and configuration settings used throughout the
 #### Purpose  
 - Provides controls for starting, pausing, and monitoring ALD runs.  
 
-#### Key Functions  
+####  Functions  
 - `create_ald_panel(parent)` – Creates the panel with input fields, buttons, and a progress bar.  
 - `start_run()` – Prepares the run by validating input and calculating runtime.  
 - `confirm_run(loops)` – Starts the ALD run and disables other controls.  
@@ -227,7 +227,7 @@ This config defines the constants and configuration settings used throughout the
 #### Purpose  
 - Manages the main power relay for the reactor.  
 
-#### Key Functions  
+####  Functions  
 - `create_main_power_task()` – Initializes the `nidaqmx` task for the power relay.  
 - `toggle_main_power()` – Toggles the power state (ON/OFF).  
 - `close()` – Ensures the relay is turned off and the task is closed.  
@@ -239,7 +239,7 @@ This config defines the constants and configuration settings used throughout the
 #### Purpose  
 - Allows users to load recipe files and manually control valves.  
 
-#### Key Functions  
+####  Functions  
 - `load_file()` – Loads a recipe file and updates the `ald_controller`.  
 - `open_manual_control()` – Opens a sub-panel for manual valve operations.  
 
@@ -251,7 +251,7 @@ This config defines the constants and configuration settings used throughout the
 - Provides controls for managing heater duty cycles, maximum temperature settings, and gas flowrates.  
 - Interfaces with the `temp_controller` for heater operations and the Alicat MFC for flowrate adjustments.  
 
-#### Key Functions  
+####  Functions  
 - `create_heater_control_panel()` – Creates entry fields and buttons for heater and flowrate controls.  
 - `set_duty_value(i, duty_cycle_var)` – Updates the duty cycle for a specific heater.  
 - `set_max_temp(i, max_temp_var)` – Sets the maximum temperature limit for a specific heater.  
@@ -266,7 +266,7 @@ This config defines the constants and configuration settings used throughout the
 - Provides real-time monitoring of pressure and temperature data using `matplotlib`.  
 - Integrates with the `log_controller` to retrieve and display data dynamically.  
 
-#### Key Functions  
+####  Functions  
 - `plot_initialize()` – Sets up the plot with default settings.  
 - `animate(i)` – Updates the plot with real-time data from pressure and temperature sensors.  
 - `toggle_show_temperatures()` – Toggles the visibility of temperature data on the plot.  
@@ -280,7 +280,7 @@ This config defines the constants and configuration settings used throughout the
 - Manages data logging, real-time monitoring, and safety mechanisms for the reactor.  
 - Monitors temperature thresholds to prevent overheating and triggers safety measures when necessary.  
 
-#### Key Functions  
+####  Functions  
 - `record_data()` – Collects sensor data and logs it to the main and monitor log files.  
 - `update_max_temp(i, max_temp)` – Updates the maximum temperature threshold for a specific sensor.  
 - `kill_run()` – Pauses the ALD run and disables main power during overheating events.  
