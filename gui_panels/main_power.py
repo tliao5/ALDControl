@@ -11,6 +11,7 @@ class MainPower:
     def __init__(self, app):
         self.app = app
         self.task = self.create_main_power_task()
+        self.app.log_controller.controllers_active_flag = True
 
     # creating nidaqmx task
     def create_main_power_task(self):
