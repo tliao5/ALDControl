@@ -16,8 +16,9 @@ class LogController:
         self.app = app
     
         self.max_temperatures = [300]*4 # default max temperature, will cause problems if this is below the starting system temp
-        self.controllers_active_flag = True # this flag is set to False when an overheat is detected, must be reset by main_power
+        self.controllers_active_flag = False # this flag is set to False on startup or when overheat is detected
                                             # otherwise the log thread would spam messages until the overheat was resolved
+                                            # main_power will set this flag to True when the system is initializing, and when power is turned on after an overheat
         # declaring data deques
         self.t_array = deque([], maxlen=200) # time array
         self.pressure_deque = deque([],maxlen=200) # pressure data
@@ -56,7 +57,6 @@ class LogController:
             
             # Kill ald run, close valves, -- flow controller will continue to be on, and logging/plotting will continue 
             if self.controllers_active_flag == True: # only check for overheat if main power is enabled/re-enabled
-                
                 ''' key: ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges"] '''
                 if tempdata[0] > self.max_temperatures[0]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}")
