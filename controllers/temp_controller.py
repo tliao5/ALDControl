@@ -11,7 +11,17 @@ import logging
 from controllers import log_controller
 import time
 import threading
-from config import HEATER_CHANNELS, TEMP_CHANNELS, MONITOR_LOG_FILE, DUTY_CYCLE_LENGTH
+from config import HEATER_CHANNELS, TEMP_CHANNELS, MONITOR_LOG_FILE, DUTY_CYCLE_LENGTH, SENSOR_NAMES
+
+## Temperature Controller
+# Creates nidaqmx tasks for each heater based on HEATER_CHANNELS
+# Creates one nidaqmx task for the thermocouples, from TEMP_CHANNELS
+#
+# Important Components:
+#   Each heater has a corresponding thread, this is set dynamically based on HEATER_CHANNELS
+#   Duty cycle and autoset are set from heater_control_panel
+#   Max temp monitoring from log_controller
+#   Only Heater 1 has autoset and it runs on a slightly different duty cycle function
 
 TICKS_PER_CYCLE = 100
 class TempController:
@@ -182,3 +192,4 @@ class TempController:
         for t in self.threads[::]: t.join()
         self.thermocoupletask.close()
         print("Thermocouple Task closing")
+
