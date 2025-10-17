@@ -79,7 +79,7 @@ class PlotPanel:
             # if Show Temperatures is active, plot temperature
             if self.show_temperatures == True:
                 self.ax_right.set_visible(True) 
-                self.ax_right.set_ylim(0,300) # maybe make the right-hand temperature y-scale dynamic also?
+                self.ax_right.set_ylim(0,200) # maybe make the right-hand temperature y-scale dynamic also?
                 for i in range(len(TEMP_CHANNELS)):
                     self.ax_right.plot(self.t_array, [row[i] for row in self.app.log_controller.temperature_deque],THERMOCOUPLE_COLORS[i])
             else:
@@ -100,7 +100,7 @@ class PlotPanel:
                 else:
                     color = ['k']*(len(self.sensors)-1)
             
-                self.ax.text(self.t_array[0] + 225, y_position, f"{sensor}, {str(tempdata[j])[:5]}", color=color[j])
+                self.ax.text(self.t_array[0] + 225, y_position, f"{sensor}, {str(tempdata[j])[:5]}", color=color[j], fontsize=14)
                 self.fig.tight_layout()
         except Exception as e:
             logging.error("Error during animation: %s", e)
