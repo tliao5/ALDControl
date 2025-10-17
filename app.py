@@ -120,4 +120,3 @@ if __name__ == "__main__":
     gui = ALDApp()
     gui.protocol("WM_DELETE_WINDOW", gui.on_closing)
     gui.mainloop()
-
