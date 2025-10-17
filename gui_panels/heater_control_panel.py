@@ -84,18 +84,6 @@ class HeaterControlPanel:
         return frame
 
     # called when Set button is pressed for any heater, sends appropriate call to temp_controller including which thread to update
-    """def set_duty_value(self, i, duty_cycle_var):
-        try:
-            duty = float(duty_cycle_var.get())
-            self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[i],duty)
-            if duty = 0: # update set button color if heater is active or not
-                self.heater_buttons[i].config(bg=OFF_COLOR)
-            else:
-                self.heater_buttons[i].config(bg=ON_COLOR)
-                print(f"Heater {i+1} set to {duty}%")
-        except:
-            print(f"Invalid Input. Please enter an integer between 0 and {self.app.temp_controller.ticks_per_cycle}.") # turn into a console warning
-            self.heater_buttons[i].config(bg=OFF_COLOR)"""
     def set_duty_value(self, i, duty_cycle_var):
         duty = float(duty_cycle_var.get())
         if self.heater_buttons[i].cget("bg") == ON_COLOR or duty==0: # ON -> OFF
@@ -114,14 +102,18 @@ class HeaterControlPanel:
     def set_max_temp(self, i, max_temp_var):
         try:
             max_temp = float(max_temp_var.get())
-            self.app.log_controller.update_max_temp(i,max_temp)
             if max_temp > 0:
+                self.app.log_controller.update_max_temp(i,max_temp)
                 self.max_temp_buttons[i].config(bg=ON_COLOR)
             else:
+                self.app.log_controller.update_max_temp(i,300)
+                print(f"Max Temp Heater {i+1} set to Default 300")
                 self.max_temp_buttons[i].config(bg=OFF_COLOR)
         except:
             print(f"Invalid Input. Please enter a positive number") # turn into a console warning
-            self.heater_buttons[i].config(bg=OFF_COLOR)
+            self.app.log_controller.update_max_temp(i,300)
+            print(f"Max Temp Heater {i+1} set to Default 300")
+            self.max_temp_buttons[i].config(bg=OFF_COLOR)
     
     # Alicat change flowrate set point sccm
     def change_setpt(self,setpt_var):
@@ -165,3 +157,4 @@ class HeaterControlPanel:
     # placeholder if this panel ever has something that needs cleanup
     def close(self):
         pass
+
