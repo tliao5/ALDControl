@@ -107,7 +107,10 @@ class TempController:
             #print(f"Current Temp: {current_temp}, Autoset Temp: {autoset_temp}, Autoset: {self.autoset.is_set()}")
             #print(f"Duty : {duty}")
             
-            # Duty Cycle
+            # Duty cycle
+            # on for duty % of time, sleep for 100-duty % of time
+            # send a log record to the monitor log every time the heater is toggled
+            # length of duty cycle defined by DUTY_CYCLE_LENGTH in config
             if duty > 0:
                 time.sleep((ticks_per_cycle-duty)*DUTY_CYCLE_LENGTH/ticks_per_cycle)
                 measurement_end_time = time.perf_counter()
@@ -195,6 +198,7 @@ class TempController:
         for t in self.threads[::]: t.join()
         self.thermocoupletask.close()
         print("Thermocouple Task closing")
+
 
 
 
