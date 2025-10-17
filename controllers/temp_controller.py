@@ -74,7 +74,10 @@ class TempController:
     
     def read_thermocouples(self):
         return self.thermocoupletask.read()
-    
+
+    # Autoset logic
+    # compare current temp to setpoint temp
+    # if current temp is too high, temporarily lower duty by 1, checks every cycle
     def autoset_duty_cycle(self,stopthread, duty_queue, log_queue, task, ticks_per_cycle):
         task.start()
         voltageold = False # default voltage state
@@ -192,6 +195,7 @@ class TempController:
         for t in self.threads[::]: t.join()
         self.thermocoupletask.close()
         print("Thermocouple Task closing")
+
 
 
 
