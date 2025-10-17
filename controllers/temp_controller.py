@@ -11,7 +11,6 @@ import logging
 from controllers import log_controller
 import time
 import threading
-from config import HEATER_CHANNELS, TEMP_CHANNELS, MONITOR_LOG_FILE, DUTY_CYCLE_LENGTH, SENSOR_NAMES
 
 ## Temperature Controller
 # Creates nidaqmx tasks for each heater based on HEATER_CHANNELS
@@ -29,12 +28,15 @@ class TempController:
         # log temperature controller intialized
         print("Temperature Controller Initializing")
         self.app = app
-        self.channels = HEATER_CHANNELS
-        self.tempchannels = TEMP_CHANNELS
+        self.HEATER_CHANNELS = app.HEATER_CHANNELS
+        self.TEMP_CHANNELS = app.TEMP_CHANNELS
+        self.MONITOR_LOG_FILE = app.MONITOR_LOG_FILE
+        self.DUTY_CYCLE_LENGTH = app.DUTY_CYCLE_LENGTH
+        self.SENSOR_NAMES = app.SENSOR_NAMES
 
         self.ticks_per_cycle = TICKS_PER_CYCLE # ticks per second for duty cycles
 
-        self.queues = [queue.Queue() for i in range(len(HEATER_CHANNELS))] # queues for thread communication
+        self.queues = [queue.Queue() for i in range(len(self.HEATER_CHANNELS))] # queues for thread communication
         self.autoset_queue = queue.Queue() # contains True/False whether or not autoset is enabled/disabled
         self.current_temp_queue = queue.Queue() # updated from log_controller, grabs most recent main reactor temperature
         self.tasks = self.create_heater_tasks()
@@ -42,28 +44,27 @@ class TempController:
         print("Temperature Controller Initialized")
 
     def create_heater_tasks(self):
-        tasks = [nidaqmx.Task(f"H{i+1}") for i in range(len(HEATER_CHANNELS))]
-        for i in range(len(HEATER_CHANNELS)):
-            tasks[i].do_channels.add_do_chan(self.channels[f"h{i+1}channel"], line_grouping=LineGrouping.CHAN_PER_LINE)
+        tasks = [nidaqmx.Task(f"H{i+1}") for i in range(len(self.HEATER_CHANNELS))]
+        for i in range(len(self.HEATER_CHANNELS)):
+            tasks[i].do_channels.add_do_chan(self.HEATER_CHANNELS[f"h{i+1}channel"], line_grouping=LineGrouping.CHAN_PER_LINE)
         return tasks
 
     def start_threads(self):
         # Create Duty Cycle threads
         self.stopthread = threading.Event()
         self.autoset = threading.Event()
-        duty_cycles = [threading.Thread() for i in range(len(HEATER_CHANNELS))]
+        duty_cycles = [threading.Thread() for i in range(len(self.HEATER_CHANNELS))]
         duty_cycles[0] = threading.Thread(target=self.autoset_duty_cycle, args=(self.stopthread, self.queues[0], self.app.log_controller.monitor_queue, self.tasks[0], self.ticks_per_cycle))
         duty_cycles[0].start()
-        for i in range(len(HEATER_CHANNELS)-1):
+        for i in range(len(self.HEATER_CHANNELS)-1):
             duty_cycles[i+1] = threading.Thread(target=self.duty_cycle, args=(self.stopthread, self.queues[i+1], self.app.log_controller.monitor_queue, self.tasks[i+1], self.ticks_per_cycle))
             duty_cycles[i+1].start()
         self.threads = duty_cycles
     
     def create_thermocouple_tasks(self):
-        self.app.logger.info(SENSOR_NAMES)
-        tempchannels = TEMP_CHANNELS
+        self.app.logger.info(self.SENSOR_NAMES)
         task = nidaqmx.Task("Thermocouple")
-        for channel_name in tempchannels:
+        for channel_name in self.TEMP_CHANNELS:
             task.ai_channels.add_ai_thrmcpl_chan(
                 f"cDaq1Mod1/{channel_name}", min_val=0.0, max_val=200.0,
                 units=TemperatureUnits.DEG_C, thermocouple_type=ThermocoupleType.K,
@@ -82,7 +83,7 @@ class TempController:
         current_temp = 0
         autoset_temp = 0
         duration = 0
-        record = log_controller.create_record(f"{task.name} Started",MONITOR_LOG_FILE)
+        record = log_controller.create_record(f"{task.name} Started",self.MONITOR_LOG_FILE)
         log_queue.put(record)
         while not stopthread.is_set(): # loop until stopthread.set()
             measurement_start_time = time.perf_counter()
@@ -112,21 +113,21 @@ class TempController:
             # send a log record to the monitor log every time the heater is toggled
             # length of duty cycle defined by DUTY_CYCLE_LENGTH in config
             if duty > 0:
-                time.sleep((ticks_per_cycle-duty)*DUTY_CYCLE_LENGTH/ticks_per_cycle)
+                time.sleep((ticks_per_cycle-duty)*self.DUTY_CYCLE_LENGTH/ticks_per_cycle)
                 measurement_end_time = time.perf_counter()
                 duration = measurement_end_time-measurement_start_time
-                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 0, {duty}, {round(duration,3)}", args=None, exc_info=None)
+                record = logging.LogRecord(name="", level=20, pathname=self.MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 0, {duty}, {round(duration,3)}", args=None, exc_info=None)
                 log_queue.put(record)
                 task.write(True) # send update signal to DAQ
                 measurement_start_time = time.perf_counter()
-                time.sleep(duty*DUTY_CYCLE_LENGTH/ticks_per_cycle)
+                time.sleep(duty*self.DUTY_CYCLE_LENGTH/ticks_per_cycle)
                 measurement_end_time = time.perf_counter()
                 duration = measurement_end_time-measurement_start_time
-                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
+                record = logging.LogRecord(name="", level=20, pathname=self.MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
                 log_queue.put(record)
                 task.write(False) # send update signal to DAQ
             else:
-                time.sleep(DUTY_CYCLE_LENGTH)
+                time.sleep(self.DUTY_CYCLE_LENGTH)
 
             
         
@@ -134,7 +135,7 @@ class TempController:
         task.write(False)
         task.stop()
         print(f"Task {task.name}: Task Closing, Voltage set to False")
-        record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name} Closed", args=None, exc_info=None)
+        record = logging.LogRecord(name="", level=20, pathname=self.MONITOR_LOG_FILE, lineno=0,msg=f"{task.name} Closed", args=None, exc_info=None)
         log_queue.put(record)
         task.close()
     
@@ -143,7 +144,7 @@ class TempController:
         voltageold = False # default voltage state
         duty_queue.put(0) # default duty
         duration = 0
-        record = log_controller.create_record(f"{task.name} Started",MONITOR_LOG_FILE)
+        record = log_controller.create_record(f"{task.name} Started",self.MONITOR_LOG_FILE)
         log_queue.put(record)
         while not stopthread.is_set(): # loop until stopthread.set()
             measurement_start_time = time.perf_counter()
@@ -152,27 +153,27 @@ class TempController:
 
             # Duty Cycle
             if duty > 0:
-                time.sleep((ticks_per_cycle-duty)*DUTY_CYCLE_LENGTH/ticks_per_cycle)
+                time.sleep((ticks_per_cycle-duty)*self.DUTY_CYCLE_LENGTH/ticks_per_cycle)
                 measurement_end_time = time.perf_counter()
                 duration = measurement_end_time-measurement_start_time
-                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 0, {duty}, {round(duration,3)}", args=None, exc_info=None)
+                record = logging.LogRecord(name="", level=20, pathname=self.MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 0, {duty}, {round(duration,3)}", args=None, exc_info=None)
                 log_queue.put(record)
                 task.write(True) # send update signal to DAQ
                 measurement_start_time = time.perf_counter()
-                time.sleep(duty*DUTY_CYCLE_LENGTH/ticks_per_cycle)
+                time.sleep(duty*self.DUTY_CYCLE_LENGTH/ticks_per_cycle)
                 measurement_end_time = time.perf_counter()
                 duration = measurement_end_time-measurement_start_time
-                record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
+                record = logging.LogRecord(name="", level=20, pathname=self.MONITOR_LOG_FILE, lineno=0,msg=f"{task.name}, 1, {duty}, {round(duration,3)}", args=None, exc_info=None)
                 log_queue.put(record)
                 task.write(False) # send update signal to DAQ
             else:
-                time.sleep(DUTY_CYCLE_LENGTH)
+                time.sleep(self.DUTY_CYCLE_LENGTH)
         
         # Close tasks after loop is told to stop by doing stopthread.set() in main program
         task.write(False)
         task.stop()
         print(f"Task {task.name}: Task Closing, Voltage set to False")
-        record = logging.LogRecord(name="", level=20, pathname=MONITOR_LOG_FILE, lineno=0,msg=f"{task.name} Closed", args=None, exc_info=None)
+        record = logging.LogRecord(name="", level=20, pathname=self.MONITOR_LOG_FILE, lineno=0,msg=f"{task.name} Closed", args=None, exc_info=None)
         log_queue.put(record)
         task.close()
 

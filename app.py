@@ -1,6 +1,5 @@
 import tkinter as tk
 
-from config import *
 from gui_panels.main_power import MainPower
 from gui_panels.heater_control_panel import HeaterControlPanel
 from gui_panels.plot_panel import PlotPanel
@@ -13,6 +12,13 @@ from controllers.ald_controller import ALDController
 from controllers.mfc_reader import AlicatController
 from controllers.log_controller import LogController
 
+
+#
+## CHOOSE THIS WHEN SELECTING DIFFERENT CONFIG FILES
+from config import *
+#
+
+
 import logging
 class ALDApp(tk.Tk):
     def __init__(self):
@@ -20,7 +26,10 @@ class ALDApp(tk.Tk):
         self.title("ALD Control")
 
         self.state("zoomed")
-        self.configure(bg=BG_COLOR)
+
+        self.read_config() # Read from desired config file
+
+        self.configure(bg=self.BG_COLOR)
         
         # Logging output setup
         # create formatters
@@ -31,27 +40,27 @@ class ALDApp(tk.Tk):
         self.logger = logging.getLogger('main_logger')
         self.logger.propagate=False
         self.logger.setLevel(logging.INFO)
-        logger_handler = logging.FileHandler(LOG_FILE)
+        logger_handler = logging.FileHandler(self.LOG_FILE)
         logger_handler.setFormatter(formatter)
         self.logger.addHandler(logger_handler)
 
         self.monitor_logger = logging.getLogger('monitor')
         self.monitor_logger.propagate=False
         self.monitor_logger.setLevel(logging.DEBUG)
-        monitor_handler = logging.FileHandler(MONITOR_LOG_FILE)
+        monitor_handler = logging.FileHandler(self.MONITOR_LOG_FILE)
         monitor_handler.setFormatter(monitor_formatter)
         self.monitor_logger.addHandler(monitor_handler)
 
         # Initialize controllers
-        self.valve_controller = ValveController()
+        self.valve_controller = ValveController(self)
         self.temp_controller = TempController(self)
-        self.pressure_controller = PressureController()
+        self.pressure_controller = PressureController(self)
         self.ald_controller = ALDController(self)
         self.log_controller = LogController(self)
 
         self.temp_controller.start_threads()
 
-        self.alicat = alicat = AlicatController(port=MFC_PORT)
+        #self.alicat = alicat = AlicatController(port=MFC_PORT)
         #self.alicat.change_setpoint(setpoint_value=0.0)
 
         # Initialize components
@@ -67,26 +76,26 @@ class ALDApp(tk.Tk):
 
     def create_layout(self):
         # outer frame contains all other frames
-        outer_frame = tk.Frame(self, bg=BG_COLOR, highlightbackground=TEXT_COLOR, highlightthickness=5)
+        outer_frame = tk.Frame(self, bg=self.BG_COLOR, highlightbackground=self.TEXT_COLOR, highlightthickness=5)
         outer_frame.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
 
         # top pane - main power switch
-        top_pane = tk.PanedWindow(outer_frame, orient=tk.VERTICAL, bg=BG_COLOR, bd=0, sashwidth=2, sashpad=0)
+        top_pane = tk.PanedWindow(outer_frame, orient=tk.VERTICAL, bg=self.BG_COLOR, bd=0, sashwidth=2, sashpad=0)
         top_pane.pack(fill=tk.BOTH, expand=True)
 
         # main power button
-        top_frame = tk.Frame(top_pane, bg=BG_COLOR, height=50, highlightbackground=BORDER_COLOR, highlightthickness=1)
+        top_frame = tk.Frame(top_pane, bg=self.BG_COLOR, height=50, highlightbackground=self.BORDER_COLOR, highlightthickness=1)
         self.main_power.create_main_power_button(top_frame)
         top_pane.add(top_frame)
 
         # main content area - will contain plot_panel and heater_control_panel
-        main_pane = tk.PanedWindow(top_pane, orient=tk.VERTICAL, bg=BG_COLOR, bd=0, sashwidth=5)
+        main_pane = tk.PanedWindow(top_pane, orient=tk.VERTICAL, bg=self.BG_COLOR, bd=0, sashwidth=5)
         main_pane.grid_rowconfigure(0, weight=1)
         main_pane.grid_columnconfigure(0, weight=1)
         top_pane.add(main_pane)
 
         # sets up the two areas for plot_panel and heater_control_panel
-        horizontal_pane = tk.PanedWindow(main_pane, orient=tk.HORIZONTAL, bg=BG_COLOR, bd=0, sashwidth=5)
+        horizontal_pane = tk.PanedWindow(main_pane, orient=tk.HORIZONTAL, bg=self.BG_COLOR, bd=0, sashwidth=5)
         main_pane.add(horizontal_pane)
         horizontal_pane.add(self.plot_panel.create_plot_panel("Left Panel Plot"))
         horizontal_pane.add(self.heater_control_panel.create_heater_control_panel())
@@ -95,10 +104,33 @@ class ALDApp(tk.Tk):
         horizontal_pane.grid_columnconfigure(1, weight=1)
 
         # bottom content area - will contain manual_control_panel and ald_panel
-        bottom_pane = tk.PanedWindow(main_pane, orient=tk.HORIZONTAL, bg=BG_COLOR, bd=0, sashwidth=5, height=300)
+        bottom_pane = tk.PanedWindow(main_pane, orient=tk.HORIZONTAL, bg=self.BG_COLOR, bd=0, sashwidth=5, height=300)
         main_pane.add(bottom_pane)
         self.manual_control_panel.create_manual_controls(bottom_pane)
         self.ald_panel.create_ald_panel(bottom_pane)
+
+    def read_config(self):
+        # Constants
+        self.BG_COLOR = BG_COLOR
+        self.TEXT_COLOR = TEXT_COLOR
+        self.ON_COLOR = ON_COLOR
+        self.OFF_COLOR = OFF_COLOR
+        self.BUTTON_STYLE = BUTTON_STYLE
+        self.BUTTON_TEXT_COLOR = BUTTON_TEXT_COLOR
+        self.BORDER_COLOR = BORDER_COLOR
+        self.FONT = FONT
+        self.LOG_FILE = LOG_FILE
+        self.MONITOR_LOG_FILE = MONITOR_LOG_FILE
+        self.Y_MIN_DEFAULT = Y_MIN_DEFAULT
+        self.Y_MAX_DEFAULT = Y_MAX_DEFAULT
+        self.MAIN_POWER_CHANNEL = MAIN_POWER_CHANNEL
+        self.VALVE_CHANNELS = VALVE_CHANNELS      
+        self.HEATER_CHANNELS = HEATER_CHANNELS
+        self.TEMP_CHANNELS = TEMP_CHANNELS
+        self.SENSOR_NAMES = SENSOR_NAMES
+        self.DUTY_CYCLE_LENGTH = DUTY_CYCLE_LENGTH # seconds
+        self.PRESSURE_CHANNEL = PRESSURE_CHANNEL
+        self.MFC_PORT = MFC_PORT
 
     def on_closing(self):
         print("GUI closing")
@@ -114,6 +146,7 @@ class ALDApp(tk.Tk):
         self.destroy()
         print("Program Closed")
         self.logger.info("ALD Control GUI Closed")
+
 
 
 if __name__ == "__main__":
