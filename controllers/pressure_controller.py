@@ -4,6 +4,7 @@ import queue
 import logging
 import time
 import threading
+from config import PRESSURE_CHANNEL
 
 ## Pressure Controller
 # More of a pressure reader
@@ -11,11 +12,11 @@ import threading
 # read_pressure called by log_controller
 
 class PressureController:
-    def __init__(self, app):
+    def __init__(self):
         print("Pressure Controller Initializing")
-        self.PRESSURE_CHANNEL = app.PRESSURE_CHANNEL
+        pressure_sensor_channel = PRESSURE_CHANNEL
         self.ptask = nidaqmx.Task("Pressure")
-        self.ptask.ai_channels.add_ai_voltage_chan(self.PRESSURE_CHANNEL["Pchannel"], min_val=-10.0, max_val=10.0)
+        self.ptask.ai_channels.add_ai_voltage_chan(pressure_sensor_channel["Pchannel"], min_val=-10.0, max_val=10.0)
         self.ptask.start()
         #log pressure controller initialized
         print("Pressure Controller Initialized")

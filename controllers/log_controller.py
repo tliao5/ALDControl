@@ -14,8 +14,6 @@ from config import LOG_FILE, MONITOR_LOG_FILE
 class LogController:
     def __init__(self,app):
         self.app = app
-        self.LOG_FILE = app.LOG_FILE
-        self.MONITOR_LOG_FILE = app.MONITOR_LOG_FILE
     
         self.max_temperatures = [300]*4 # default max temperature, will cause problems if this is below the starting system temp
         self.controllers_active_flag = False # this flag is set to False on startup or when overheat is detected
@@ -43,7 +41,7 @@ class LogController:
             
             tempdata = self.app.temp_controller.read_thermocouples() # get temperature data
             pressuredata = self.app.pressure_controller.read_pressure() # get pressure data
-            record = create_record(str(tempdata + [pressuredata]), self.LOG_FILE) 
+            record = create_record(str(tempdata + [pressuredata]), LOG_FILE) 
             self.app.logger.handle(record) # log to main log file
             
             # send main reactor temp to Heater 1 thread for autoset
@@ -64,23 +62,27 @@ class LogController:
                 ''' key: ["main reactor", "inlet lower", "inlet upper", "exhaust", "TMA", "Trap", "Gauges"] '''
                 if tempdata[0] > self.max_temperatures[0]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}")
-                    record = create_record(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}", self.MONITOR_LOG_FILE)
+                    record = create_record(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}")
                     self.kill_run()
                 if tempdata[5] > self.max_temperatures[1]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}")
-                    record = create_record(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}", self.MONITOR_LOG_FILE)
+                    record = create_record(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}")
                     self.kill_run()
                 if max(tempdata[1],tempdata[2],tempdata[4]) > self.max_temperatures[2]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}")
-                    record = create_record(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}", self.MONITOR_LOG_FILE)
+                    record = create_record(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}")
                     self.kill_run()
                 if max(tempdata[3],tempdata[6]) > self.max_temperatures[3]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}")
-                    record = create_record(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}", self.MONITOR_LOG_FILE)
+                    record = create_record(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}")
                     self.kill_run()
                     
             
