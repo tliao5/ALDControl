@@ -189,7 +189,7 @@ class TempController:
             else:
                 raise Exception()
         except:
-            print(f"Invalid Input. Please enter an integer between 0 and {self.ticks_per_cycle}.")   # turn into a log warning
+            print(f"Error in temp_controller.update_duty_cycle(): Invalid Input. Please enter an integer between 0 and {self.ticks_per_cycle}.")   # turn into a log warning
             queue.put(0)
             return 0
   
@@ -198,10 +198,3 @@ class TempController:
         for t in self.threads[::]: t.join()
         self.thermocoupletask.close()
         print("Thermocouple Task closing")
-
-
-
-
-
-
-
