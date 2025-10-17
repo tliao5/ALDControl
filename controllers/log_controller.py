@@ -19,6 +19,7 @@ class LogController:
         self.controllers_active_flag = False # this flag is set to False on startup or when overheat is detected
                                             # otherwise the log thread would spam messages until the overheat was resolved
                                             # main_power will set this flag to True when the system is initializing, and when power is turned on after an overheat
+        print(self.controllers_active_flag)
         # declaring data deques
         self.t_array = deque([], maxlen=200) # time array
         self.pressure_deque = deque([],maxlen=200) # pressure data
@@ -54,6 +55,8 @@ class LogController:
             # update monitor log file
             while not self.monitor_queue.empty():
                 self.app.monitor_logger.handle(self.monitor_queue.get(block=False))
+            
+            #print(self.controllers_active_flag)
             
             # Kill ald run, close valves, -- flow controller will continue to be on, and logging/plotting will continue 
             if self.controllers_active_flag == True: # only check for overheat if main power is enabled/re-enabled
