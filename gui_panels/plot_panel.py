@@ -100,7 +100,7 @@ class PlotPanel:
                 else:
                     color = ['k']*(len(self.sensors)-1)
             
-                self.ax.text(self.t_array[0] + 225, y_position, f"{sensor}, {str(tempdata[j])[:5]}", color=color[j])
+                self.ax.text(self.t_array[0] + 225, y_position, f"{sensor}, {str(tempdata[j])[:5]}", color=color[j], fontsize=14)
                 self.fig.tight_layout()
         except Exception as e:
             logging.error("Error during animation: %s", e)
@@ -117,3 +117,4 @@ class PlotPanel:
     # cleanup
     def close(self):
         plt.close(self.fig)
+

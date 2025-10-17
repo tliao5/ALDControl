@@ -41,7 +41,6 @@ class TempController:
         self.thermocoupletask = self.create_thermocouple_tasks()
         print("Temperature Controller Initialized")
 
-    # heater nidaqmx tasks
     def create_heater_tasks(self):
         tasks = [nidaqmx.Task(f"H{i+1}") for i in range(len(HEATER_CHANNELS))]
         for i in range(len(HEATER_CHANNELS)):
@@ -49,7 +48,7 @@ class TempController:
         return tasks
 
     def start_threads(self):
-        # create duty cycle threads
+        # Create Duty Cycle threads
         self.stopthread = threading.Event()
         self.autoset = threading.Event()
         duty_cycles = [threading.Thread() for i in range(len(HEATER_CHANNELS))]
@@ -75,7 +74,7 @@ class TempController:
     
     def read_thermocouples(self):
         return self.thermocoupletask.read()
-    
+        
     def autoset_duty_cycle(self,stopthread, duty_queue, log_queue, task, ticks_per_cycle):
         task.start()
         voltageold = False # default voltage state
@@ -89,7 +88,6 @@ class TempController:
             measurement_start_time = time.perf_counter()
             if not duty_queue.empty(): # check for updates in queue
                 set_duty = duty_queue.get(block=False)
-            
 
             # Autoset logic
             # compare current temp to setpoint temp
@@ -109,7 +107,7 @@ class TempController:
             #print(f"Current Temp: {current_temp}, Autoset Temp: {autoset_temp}, Autoset: {self.autoset.is_set()}")
             #print(f"Duty : {duty}")
             
-            # duty cycle
+            # Duty cycle
             # on for duty % of time, sleep for 100-duty % of time
             # send a log record to the monitor log every time the heater is toggled
             # length of duty cycle defined by DUTY_CYCLE_LENGTH in config
@@ -132,7 +130,7 @@ class TempController:
 
             
         
-        # close tasks after loop is told to stop by doing stopthread.set() in main program
+        # Close tasks after loop is told to stop by doing stopthread.set() in main program
         task.write(False)
         task.stop()
         print(f"Task {task.name}: Task Closing, Voltage set to False")
@@ -147,15 +145,12 @@ class TempController:
         duration = 0
         record = log_controller.create_record(f"{task.name} Started",MONITOR_LOG_FILE)
         log_queue.put(record)
-        while not stopthread.is_set(): # loop until tc.stopthread.set()
+        while not stopthread.is_set(): # loop until stopthread.set()
             measurement_start_time = time.perf_counter()
             if not duty_queue.empty(): # check for updates in queue
                 duty = duty_queue.get(block=False)
 
-            # duty cycle
-            # on for duty % of time, sleep for 100-duty % of time
-            # send a log record to the monitor log every time the heater is toggled
-            # length of duty cycle defined by DUTY_CYCLE_LENGTH in config
+            # Duty Cycle
             if duty > 0:
                 time.sleep((ticks_per_cycle-duty)*DUTY_CYCLE_LENGTH/ticks_per_cycle)
                 measurement_end_time = time.perf_counter()
@@ -173,7 +168,7 @@ class TempController:
             else:
                 time.sleep(DUTY_CYCLE_LENGTH)
         
-        # Close tasks after loop is told to stop by setting stopthread
+        # Close tasks after loop is told to stop by doing stopthread.set() in main program
         task.write(False)
         task.stop()
         print(f"Task {task.name}: Task Closing, Voltage set to False")
@@ -182,10 +177,21 @@ class TempController:
         task.close()
 
     def update_duty_cycle(self, queue, duty):
-        while not queue.empty(): # clear queue
-            queue.get()
-            print("get")
-        queue.put(duty)
+        try:
+            print("tempcontroller")
+            if 0 <= duty <= self.ticks_per_cycle:
+                print(f"Duty cycle updated {duty}")
+                # log duty cycle updated
+                while not queue.empty():
+                    queue.get()
+                queue.put(duty)
+                return duty
+            else:
+                raise Exception()
+        except:
+            print(f"Error in temp_controller.update_duty_cycle(): Invalid Input. Please enter an integer between 0 and {self.ticks_per_cycle}.")   # turn into a log warning
+            queue.put(0)
+            return 0
   
     def close(self):
         self.stopthread.set()
