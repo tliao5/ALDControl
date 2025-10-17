@@ -60,7 +60,7 @@ class TempController:
         self.threads = duty_cycles
     
     def create_thermocouple_tasks(self):
-        self.app.logger.info("main reactor,inlet lower, inlet upper, exhaust,TMA,Trap,Gauges")
+        self.app.logger.info(SENSOR_NAMES)
         tempchannels = TEMP_CHANNELS
         task = nidaqmx.Task("Thermocouple")
         for channel_name in tempchannels:
@@ -192,5 +192,6 @@ class TempController:
         for t in self.threads[::]: t.join()
         self.thermocoupletask.close()
         print("Thermocouple Task closing")
+
 
 
