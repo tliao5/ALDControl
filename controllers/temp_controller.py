@@ -130,7 +130,7 @@ class TempController:
 
             
         
-        # Close tasks after loop is told to stop by doing tc.stopthread.set() in main program
+        # Close tasks after loop is told to stop by doing stopthread.set() in main program
         task.write(False)
         task.stop()
         print(f"Task {task.name}: Task Closing, Voltage set to False")
@@ -145,7 +145,7 @@ class TempController:
         duration = 0
         record = log_controller.create_record(f"{task.name} Started",MONITOR_LOG_FILE)
         log_queue.put(record)
-        while not stopthread.is_set(): # loop until tc.stopthread.set()
+        while not stopthread.is_set(): # loop until stopthread.set()
             measurement_start_time = time.perf_counter()
             if not duty_queue.empty(): # check for updates in queue
                 duty = duty_queue.get(block=False)
@@ -168,7 +168,7 @@ class TempController:
             else:
                 time.sleep(DUTY_CYCLE_LENGTH)
         
-        # Close tasks after loop is told to stop by doing tc.stopthread.set() in main program
+        # Close tasks after loop is told to stop by doing stopthread.set() in main program
         task.write(False)
         task.stop()
         print(f"Task {task.name}: Task Closing, Voltage set to False")
@@ -198,6 +198,7 @@ class TempController:
         for t in self.threads[::]: t.join()
         self.thermocoupletask.close()
         print("Thermocouple Task closing")
+
 
 
 
