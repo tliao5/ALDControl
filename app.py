@@ -23,7 +23,7 @@ class ALDApp(tk.Tk):
         self.configure(bg=BG_COLOR)
         
         # Logging output setup
-        # create formatters ormatters
+        # create formatters
         formatter = logging.Formatter(fmt='%(asctime)s %(message)s',datefmt='%m/%d %H:%M:%S')
         monitor_formatter = logging.Formatter( fmt='%(asctime)s.%(msecs)03d %(message)s',datefmt='%m/%d %H:%M:%S')
 
@@ -51,7 +51,7 @@ class ALDApp(tk.Tk):
 
         self.temp_controller.start_threads()
 
-        #self.alicat = alicat = AlicatController(port=MFC_PORT)
+        self.alicat = alicat = AlicatController(port=MFC_PORT)
         #self.alicat.change_setpoint(setpoint_value=0.0)
 
         # Initialize components
@@ -120,3 +120,4 @@ if __name__ == "__main__":
     gui = ALDApp()
     gui.protocol("WM_DELETE_WINDOW", gui.on_closing)
     gui.mainloop()
+
