@@ -2,24 +2,23 @@ import nidaqmx
 from nidaqmx.constants import LineGrouping
 import time
 import threading
-from config import VALVE_CHANNELS
 
 ## Valve Controler
 # Create nidaqmx channels for each valve based on VALVE_CHANNELS
 # Open / Close / Pulse / Close_All different valve functions
 
 class ValveController:
-    def __init__(self):
+    def __init__(self, app):
         print("Valve Controller Initialized")
-        self.valvechannels = VALVE_CHANNELS
+        self.VALVE_CHANNELS = app.VALVE_CHANNELS
         self.tasks = self.create_valve_tasks()
         # log valve controller initialized
         print("Valve Controller Initialized")
         
     def create_valve_tasks(self):
-        valves = [nidaqmx.Task(f"AV0{i+1}") for i in range(len(VALVE_CHANNELS))]
-        for i in range(len(VALVE_CHANNELS)):
-            valves[i].do_channels.add_do_chan(self.valvechannels[f"AV0{i+1}"], line_grouping=LineGrouping.CHAN_PER_LINE)
+        valves = [nidaqmx.Task(f"AV0{i+1}") for i in range(len(self.VALVE_CHANNELS))]
+        for i in range(len(self.VALVE_CHANNELS)):
+            valves[i].do_channels.add_do_chan(self.VALVE_CHANNELS[f"AV0{i+1}"], line_grouping=LineGrouping.CHAN_PER_LINE)
             valves[i].start()
         return valves
 

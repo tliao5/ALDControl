@@ -6,7 +6,6 @@ import time
 import threading
 import queue
 
-from config import MONITOR_LOG_FILE
 
 ## ALD Controller
 # Creates new thread to run recipe
@@ -17,6 +16,7 @@ class ALDController:
     def __init__(self, app):
         print("ALD Recipe Controller Initializing")
         self.app = app
+        self.MONITOR_LOG_FILE = app.MONITOR_LOG_FILE
         self.stopthread = threading.Event()
         self.queue = queue.Queue()
         print("ALD Recipe Controller Initialized")
@@ -39,7 +39,7 @@ class ALDController:
         print(dataNP)
         # log run starting and recipe order
         print("Run Starting")
-        record = log_controller.create_record("Run Starting",MONITOR_LOG_FILE)
+        record = log_controller.create_record("Run Starting",self.MONITOR_LOG_FILE)
         monitor_queue.put(record)
         previndices = []
         for i in range(loops): #This is the number of loops the user wants to iterate the current file (ie - number of ALD cycles)
@@ -65,11 +65,11 @@ class ALDController:
                 
                 if indices: # send a log entry to the monitor log file saying which valve has been triggered
                     valve_names = " ".join([f"AV0{i+1}" for i in indices])
-                    record = log_controller.create_record(f"{valve_names}, {dataNP[j][6]}",MONITOR_LOG_FILE)
+                    record = log_controller.create_record(f"{valve_names}, {dataNP[j][6]}",self.MONITOR_LOG_FILE)
                     monitor_queue.put(record)
                     vc.pulse_valve(indices,dataNP[j][6])
                 else: # if there are no valves being pulsed, assume the system is purging and send a log entry
-                    record = log_controller.create_record(f"Purge, {dataNP[j][6]}",MONITOR_LOG_FILE)
+                    record = log_controller.create_record(f"Purge, {dataNP[j][6]}",self.MONITOR_LOG_FILE)
                     monitor_queue.put(record)
                     time.sleep(dataNP[j][6])
                 previndices = indices
@@ -77,7 +77,7 @@ class ALDController:
                 queue.put(elapsed_time)
                 #print()
         print("Run Over")
-        record = log_controller.create_record(f"ALD Run Finished - {loops} Cycles", MONITOR_LOG_FILE)
+        record = log_controller.create_record(f"ALD Run Finished - {loops} Cycles", self.MONITOR_LOG_FILE)
         monitor_queue.put(record)
         vc.close_all() # extra safety check that all ald valves are shut at the end of a run
 
