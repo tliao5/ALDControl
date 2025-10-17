@@ -87,11 +87,12 @@ class HeaterControlPanel:
     def set_duty_value(self, i, duty_cycle_var):
         try:
             duty = float(duty_cycle_var.get())
-            self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[i],duty)
-            if duty <= 0: # update set button color if heater is active or not
-                self.heater_buttons[i].config(bg=OFF_COLOR)
-            else:
-                self.heater_buttons[i].config(bg=ON_COLOR)
+            if self.heater_buttons[i].cget('bg') == ON_COLOR or duty == 0: # ON -> OFF
+                self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[i],0)
+                self.heater_buttons[i].config(bg=OFF_COLOR) # turn button to off if it was on
+            else: # OFF -> ON
+                self.heater_buttons[i].config(bg=ON_COLOR) 
+                self.app.temp_controller.update_duty_cycle(self.app.temp_controller.queues[i],duty)
                 print(f"Heater {i+1} set to {duty}%")
         except:
             print(f"Invalid Input. Please enter an integer between 0 and {self.app.temp_controller.ticks_per_cycle}.") # turn into a console warning
@@ -153,3 +154,4 @@ class HeaterControlPanel:
     # placeholder if this panel ever has something that needs cleanup
     def close(self):
         pass
+
