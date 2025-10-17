@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from collections import deque
 import time
 import logging
-from config import *
 
 # colors for Show Temperature function, needs to have at least as many colors as thermocouples to display
 THERMOCOUPLE_COLORS = ["b","g","r","c","m","y","k","steelblue","fuchsia","navy","peru","lawngreen"]
@@ -14,13 +13,26 @@ THERMOCOUPLE_COLORS = ["b","g","r","c","m","y","k","steelblue","fuchsia","navy",
 class PlotPanel:
     def __init__(self, app):
         self.app = app
+        self.BG_COLOR = app.BG_COLOR
+        self.BORDER_COLOR = app.BORDER_COLOR
+        self.FONT = app.FONT
+        self.TEXT_COLOR = app.TEXT_COLOR
+        self.BUTTON_TEXT_COLOR = app.BUTTON_TEXT_COLOR
+        self.BUTTON_STYLE = app.BUTTON_STYLE
+        self.ON_COLOR = app.ON_COLOR
+        self.OFF_COLOR = app.OFF_COLOR
+        self.Y_MIN_DEFAULT = app.Y_MIN_DEFAULT
+        self.Y_MAX_DEFAULT = app.Y_MAX_DEFAULT
+        self.SENSOR_NAMES = app.SENSOR_NAMES
+        self.TEMP_CHANNELS = app.TEMP_CHANNELS
+
         self.fig, self.ax, self.ax_right, self.pressure, self.t_array, self.t_start, self.sensors = self.plot_initialize()
-        self.ymin = tk.StringVar(value=Y_MIN_DEFAULT)
-        self.ymax = tk.StringVar(value=Y_MAX_DEFAULT)
+        self.ymin = tk.StringVar(value=self.Y_MIN_DEFAULT)
+        self.ymax = tk.StringVar(value=self.Y_MAX_DEFAULT)
         self.show_temperatures = False
 
     def create_plot_panel(self, title):
-        frame = tk.Frame(bg=TEXT_COLOR, highlightbackground=BORDER_COLOR, highlightthickness=1)
+        frame = tk.Frame(bg=self.TEXT_COLOR, highlightbackground=self.BORDER_COLOR, highlightthickness=1)
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
         self.plot_data = []
@@ -35,16 +47,16 @@ class PlotPanel:
         toolbar_frame.grid(row=41, column=0, columnspan=30, pady=5)
 
         # dynamic setting of y-scale minimum and maximum
-        row = tk.Frame(frame, bg=TEXT_COLOR)
+        row = tk.Frame(frame, bg=self.TEXT_COLOR)
         row.grid(row=frame.grid_size()[1], column=0, columnspan=frame.grid_size()[0], pady=10)
-        tk.Label(row, text="y-min:", relief=BUTTON_STYLE, bg=BG_COLOR, font=FONT).pack(side=tk.LEFT, padx=5)
-        tk.Entry(row, width=10, textvariable=self.ymin, font=FONT).pack(side=tk.LEFT, padx=5)
-        tk.Label(row, text="y-max:", relief=BUTTON_STYLE, bg=BG_COLOR, font=FONT).pack(side=tk.LEFT, padx=5)
-        tk.Entry(row, width=10, textvariable=self.ymax, font=FONT).pack(side=tk.LEFT, padx=5)
+        tk.Label(row, text="y-min:", relief=self.BUTTON_STYLE, bg=self.BG_COLOR, font=self.FONT).pack(side=tk.LEFT, padx=5)
+        tk.Entry(row, width=10, textvariable=self.ymin, font=self.FONT).pack(side=tk.LEFT, padx=5)
+        tk.Label(row, text="y-max:", relief=self.BUTTON_STYLE, bg=self.BG_COLOR, font=self.FONT).pack(side=tk.LEFT, padx=5)
+        tk.Entry(row, width=10, textvariable=self.ymax, font=self.FONT).pack(side=tk.LEFT, padx=5)
         
         # Show Temperatures Button
         self.show_temperatures_button = tk.Button(
-            row, text='Show Temperatures OFF', fg=BUTTON_TEXT_COLOR, bg=OFF_COLOR, relief=BUTTON_STYLE,  font=FONT,
+            row, text='Show Temperatures OFF', fg=self.BUTTON_TEXT_COLOR, bg=self.OFF_COLOR, relief=self.BUTTON_STYLE,  font=self.FONT,
             command=self.toggle_show_temperatures)
         self.show_temperatures_button.pack(padx=5)
 
@@ -63,7 +75,7 @@ class PlotPanel:
         pressure = self.app.log_controller.pressure_deque
         t_start = self.app.log_controller.t_start
         t_array = self.app.log_controller.t_array
-        sensors = SENSOR_NAMES
+        sensors = self.SENSOR_NAMES
         return fig, ax, ax_right, pressure, t_array, t_start, sensors
 
     def animate(self, i):
@@ -80,7 +92,7 @@ class PlotPanel:
             if self.show_temperatures == True:
                 self.ax_right.set_visible(True) 
                 self.ax_right.set_ylim(0,300) # maybe make the right-hand temperature y-scale dynamic also?
-                for i in range(len(TEMP_CHANNELS)):
+                for i in range(len(self.TEMP_CHANNELS)):
                     self.ax_right.plot(self.t_array, [row[i] for row in self.app.log_controller.temperature_deque],THERMOCOUPLE_COLORS[i])
             else:
                 self.ax_right.set_visible(False) 
@@ -109,10 +121,10 @@ class PlotPanel:
     def toggle_show_temperatures(self):
         if self.show_temperatures_button['text'] == 'Show Temperatures ON':
             self.show_temperatures = False
-            self.show_temperatures_button.config(text='Show Temperatures OFF', bg=OFF_COLOR)
+            self.show_temperatures_button.config(text='Show Temperatures OFF', bg=self.OFF_COLOR)
         elif self.show_temperatures_button['text'] == 'Show Temperatures OFF':
             self.show_temperatures = True
-            self.show_temperatures_button.config(text='Show Temperatures ON', bg=ON_COLOR)
+            self.show_temperatures_button.config(text='Show Temperatures ON', bg=self.ON_COLOR)
 
     # cleanup
     def close(self):

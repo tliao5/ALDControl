@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from config import *
 import threading
 import pandas as pd
 
@@ -20,6 +19,16 @@ import pandas as pd
 class ALDPanel:
     def __init__(self, app):
         self.app = app
+        self.BG_COLOR = app.BG_COLOR
+        self.BORDER_COLOR = app.BORDER_COLOR
+        self.FONT = app.FONT
+        self.TEXT_COLOR = app.TEXT_COLOR
+        self.BUTTON_TEXT_COLOR = app.BUTTON_TEXT_COLOR
+        self.BUTTON_STYLE = app.BUTTON_STYLE
+        self.LOG_FILE = app.LOG_FILE
+        self.ON_COLOR = app.ON_COLOR
+        self.OFF_COLOR = app.OFF_COLOR
+        
 
         self.runtime = 0 # calculated based on number of loops multiplied by ald cycle time
         self.loops=tk.StringVar() # entry field for number of loops
@@ -32,31 +41,31 @@ class ALDPanel:
         self.pause_run_event = threading.Event() # communication with ald_controller to pause/unpause a run
 
     def create_ald_panel(self, parent):
-        self.ald_panel = tk.Frame(parent, bg=BG_COLOR, highlightbackground=BORDER_COLOR, highlightthickness=1)
+        self.ald_panel = tk.Frame(parent, bg=self.BG_COLOR, highlightbackground=self.BORDER_COLOR, highlightthickness=1)
         parent.add(self.ald_panel)
 
         # recipe entry and run button
-        recipe_frame = tk.Frame(self.ald_panel, bg=BG_COLOR, pady=10)
+        recipe_frame = tk.Frame(self.ald_panel, bg=self.BG_COLOR, pady=10)
         recipe_frame.pack(fill=tk.X, padx=10, pady=5)
-        tk.Label(recipe_frame, text="Cycles:", bg=BG_COLOR, font=FONT).pack(side=tk.LEFT, padx=5)
-        tk.Entry(recipe_frame, textvariable=self.loops, width=10, font=FONT).pack(side=tk.LEFT, padx=5)
+        tk.Label(recipe_frame, text="Cycles:", bg=self.BG_COLOR, font=self.FONT).pack(side=tk.LEFT, padx=5)
+        tk.Entry(recipe_frame, textvariable=self.loops, width=10, font=self.FONT).pack(side=tk.LEFT, padx=5)
         tk.Button(
-            recipe_frame, text="Run Recipe", font=FONT, bg=TEXT_COLOR, relief=BUTTON_STYLE,
+            recipe_frame, text="Run Recipe", font=self.FONT, bg=self.TEXT_COLOR, relief=self.BUTTON_STYLE,
             command=lambda:self.start_run()  # call start_run directly on button press
         ).pack(side=tk.LEFT, padx=5)
 
         # label field for run state
-        self.recipe_label = tk.Label(recipe_frame, text="Status: New Run", bg=BG_COLOR, font=FONT)
+        self.recipe_label = tk.Label(recipe_frame, text="Status: New Run", bg=self.BG_COLOR, font=self.FONT)
         self.recipe_label.pack(side=tk.LEFT, padx=5)
 
         # progress bar and time display
-        self.progresstime = tk.Label(self.ald_panel, text=f"Time: {self.format_time(0)}", bg=BG_COLOR, font=FONT)
+        self.progresstime = tk.Label(self.ald_panel, text=f"Time: {self.format_time(0)}", bg=self.BG_COLOR, font=self.FONT)
         self.progresstime.pack(side=tk.LEFT, anchor=tk.NW, padx=20)
         self.progressbar = ttk.Progressbar(self.ald_panel, orient=tk.HORIZONTAL, length=400)
         self.progressbar.pack(pady=5, padx=30, anchor=tk.NW)
         
         # log file
-        tk.Label(self.ald_panel, text=f"Log File Output: {LOG_FILE}", bg=BG_COLOR, font=FONT).pack(padx=20, pady=5, side=tk.TOP, anchor=tk.NW)
+        tk.Label(self.ald_panel, text=f"Log File Output: {self.LOG_FILE}", bg=self.BG_COLOR, font=self.FONT).pack(padx=20, pady=5, side=tk.TOP, anchor=tk.NW)
 
     # triggered when the Run Recipe button is pressed - calculates cycle time, creates a confirm run button to trigger the ald_controller thread
     def start_run(self):
@@ -91,7 +100,7 @@ class ALDPanel:
             # add Confirm button
             if not self.confirm_button:
                 self.confirm_button = tk.Button(
-                    self.recipe_label.master, text="Confirm", font=FONT, bg=ON_COLOR, relief=BUTTON_STYLE,
+                    self.recipe_label.master, text="Confirm", font=self.FONT, bg=self.ON_COLOR, relief=self.BUTTON_STYLE,
                     command=lambda loops = self.loops : self.confirm_run(loops)
                 )
             self.confirm_button.pack(side=tk.LEFT, padx=5)
@@ -124,7 +133,7 @@ class ALDPanel:
                 widget.config(state=tk.DISABLED)
 
         # create pause button
-        self.pause_button = tk.Button(self.recipe_label.master, text="Pause Run", font=FONT, bg=ON_COLOR, fg=BUTTON_TEXT_COLOR, relief=BUTTON_STYLE,
+        self.pause_button = tk.Button(self.recipe_label.master, text="Pause Run", font=self.FONT, bg=self.ON_COLOR, fg=self.BUTTON_TEXT_COLOR, relief=self.BUTTON_STYLE,
                     command=lambda: self.toggle_pause_run())
         self.pause_button.pack(side=tk.LEFT,padx=5)
 
@@ -143,22 +152,22 @@ class ALDPanel:
     
     # toggle between paused and unpaused
     def toggle_pause_run(self):
-        if self.pause_button["bg"] == ON_COLOR:
+        if self.pause_button["bg"] == self.ON_COLOR:
             self.pause_run()
-        elif self.pause_button["bg"] == OFF_COLOR:
+        elif self.pause_button["bg"] == self.OFF_COLOR:
             self.unpause_run()
     
     def pause_run(self):
         print("paused")
         self.pause_run_event.set() # communicates to ald_controller to pause
-        self.pause_button["bg"] = OFF_COLOR
+        self.pause_button["bg"] = self.OFF_COLOR
         self.pause_button["text"] = "Unpause Run"
         self.recipe_label["text"]="Status: Run Paused"
     
     def unpause_run(self):
         print("unpaused")
         self.pause_run_event.clear() # communicates to ald_controller to unpause
-        self.pause_button["bg"] = ON_COLOR
+        self.pause_button["bg"] = self.ON_COLOR
         self.pause_button["text"] = "Pause Run"
         self.recipe_label.config(text="Status: Run in Progress")
 
