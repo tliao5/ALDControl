@@ -34,9 +34,9 @@ class TempController:
 
         self.ticks_per_cycle = TICKS_PER_CYCLE # ticks per second for duty cycles
 
-        self.queues = [queue.Queue() for i in range(len(HEATER_CHANNELS))]
-        self.autoset_queue = queue.Queue()
-        self.current_temp_queue = queue.Queue()
+        self.queues = [queue.Queue() for i in range(len(HEATER_CHANNELS))] # queues for thread communication
+        self.autoset_queue = queue.Queue() # contains True/False whether or not autoset is enabled/disabled
+        self.current_temp_queue = queue.Queue() # updated from log_controller, grabs most recent main reactor temperature
         self.tasks = self.create_heater_tasks()
         self.thermocoupletask = self.create_thermocouple_tasks()
         print("Temperature Controller Initialized")
@@ -192,4 +192,5 @@ class TempController:
         for t in self.threads[::]: t.join()
         self.thermocoupletask.close()
         print("Thermocouple Task closing")
+
 
