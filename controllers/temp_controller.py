@@ -178,9 +178,7 @@ class TempController:
 
     def update_duty_cycle(self, queue, duty):
         try:
-            print("tempcontroller")
             if 0 <= duty <= self.ticks_per_cycle:
-                print(f"Duty cycle updated {duty}")
                 # log duty cycle updated
                 while not queue.empty():
                     queue.get()

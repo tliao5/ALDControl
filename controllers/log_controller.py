@@ -64,21 +64,25 @@ class LogController:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}")
                     record = create_record(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Main Reactor {tempdata[0]} > {self.max_temperatures[0]}")
                     self.kill_run()
                 if tempdata[5] > self.max_temperatures[1]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}")
                     record = create_record(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Trap {tempdata[5]} > {self.max_temperatures[1]}")
                     self.kill_run()
                 if max(tempdata[1],tempdata[2],tempdata[4]) > self.max_temperatures[2]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}")
                     record = create_record(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Inlet Lower, Inlet Upper, TMA {tempdata[1]},{tempdata[2]},{tempdata[4]} > {self.max_temperatures[2]}")
                     self.kill_run()
                 if max(tempdata[3],tempdata[6]) > self.max_temperatures[3]:
                     self.app.logger.warning(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}")
                     record = create_record(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}", MONITOR_LOG_FILE)
                     self.monitor_queue.put(record)
+                    print(f"SYSTEM OVERHEAT - Gauges, Exhaust {tempdata[3]},{tempdata[6]} > {self.max_temperatures[3]}")
                     self.kill_run()
                     
             
